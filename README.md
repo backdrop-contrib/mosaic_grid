@@ -6,7 +6,7 @@ Here is a short list of features:
 
 - Justified responsive grid layout for images.
 - Optimised image loading (lazy loading).
-- Plenty of configuration options like Gap, Margin, Row Height etc.
+- Plenty of configuration options like image row height, gap etc.
 - Captions that appear on mouse hover.
 - Ability to tweak caption style without writing extra CSS.
 - Ability to use rich text for captions (by adding text fields in views).
