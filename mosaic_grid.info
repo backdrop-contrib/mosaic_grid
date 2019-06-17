@@ -1,0 +1,8 @@
+name = Mosaic Grid
+description = Provides views style plugin for building image galleries layed out in a justified responsive grid.
+backdrop = 1.x
+package = Views
+type = module
+version = 1.x-0.1-beta
+dependencies[] = views
+configure = admin/config/media/mosaic_grid
