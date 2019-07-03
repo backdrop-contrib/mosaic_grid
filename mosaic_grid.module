@@ -261,13 +261,8 @@ SPIN;
         font-size: {$font_size}pt;
         padding: {$padding}pt {$padding_hor}pt;
       }
-      .mosaic-grid-caption > p,
-      .mosaic-grid-caption > h1,
-      .mosaic-grid-caption > h2, 
-      .mosaic-grid-caption > h3,
-      .mosaic-grid-caption > h4,
-      .mosaic-grid-caption > h5,
-      .mosaic-grid-caption > h6 {
+      
+      .mosaic-grid-caption > * {
         color: {$color} !important;
       }
 CAP;
