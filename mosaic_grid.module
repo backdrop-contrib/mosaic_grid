@@ -221,6 +221,7 @@ SPIN;
           break;
 
         case 'floating_balls':
+        case 'three_dots':
         case 'square_blocks':
           $loader_css = <<<"SPIN"
             .mosaic-grid-loader {
@@ -259,6 +260,15 @@ SPIN;
         background: rgba(0, 0, 0, {$opacity});
         font-size: {$font_size}pt;
         padding: {$padding}pt {$padding_hor}pt;
+      }
+      .mosaic-grid-caption > p,
+      .mosaic-grid-caption > h1,
+      .mosaic-grid-caption > h2, 
+      .mosaic-grid-caption > h3,
+      .mosaic-grid-caption > h4,
+      .mosaic-grid-caption > h5,
+      .mosaic-grid-caption > h6 {
+        color: {$color} !important;
       }
 CAP;
     // Add the css as inline style sheet.

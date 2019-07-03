@@ -25,6 +25,7 @@ function mosaic_grid_admin_form($form, &$form_state) {
       'spinning_ring'      => t('Spinning Ring'),
       'spinning_ring_thin' => t('Spinning Ring Thin'),
       'floating_balls'     => t('Floating Balls'),
+      'three_dots'         => t('Three Dots'),
       'square_blocks'      => t('Square Blocks'),
       'vertical_blocks'    => t('Vertical Blocks'),
     ),

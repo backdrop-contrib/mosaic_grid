@@ -3,6 +3,8 @@
   border-radius: 50%;
   width: 11em;
   height: 11em;
+  margin-left: -5.5em;
+  margin-top: -5.5em;
 }
 
 .mosaic-grid-loader {

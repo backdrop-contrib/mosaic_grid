@@ -1,12 +1,13 @@
 .mosaic-grid-loader {
   position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
   z-index: -1;
 }
 
 .mosaic-grid-item {
   position: relative;
+  z-index: 100;
   background-color: rgba(0,0,0,0.1);
 }
 
@@ -15,23 +16,36 @@
   min-height: 100%;
 }
 
-.mosaic-grid-caption {
+.mosaic-grid-overlay {
   opacity: 0;
   position: absolute;
-  left: 0px; right: 0px; bottom: 0px;
-  z-index: 1;
-  padding: 5pt 8pt;
-  background: rgba(0, 0, 0, 0.5);
+  left: 0px; right: 0px; top: 0px; bottom: 0px;
+  pointer-events: none;
+  z-index: 101;
   transition: opacity .2s ease-in-out;
   -moz-transition: opacity .2s ease-in-out;
-  -webkit-transition: opacity .2s ease-in-out; 
+  -webkit-transition: opacity .2s ease-in-out;
 }
 
-.mosaic-grid-item:hover > .mosaic-grid-caption {
+.mosaic-grid-caption {
+  position: absolute;
+  left: 0px; right: 0px; bottom: 0px;
+  z-index: 102;
+  padding: 5pt 8pt;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.mosaic-grid-item:hover > .mosaic-grid-overlay {
   opacity: 1;
 }
 
-.mosaic-grid-caption > p, h1, h2, h3, h4, h5, h6 {
+.mosaic-grid-caption > p,
+.mosaic-grid-caption > h1,
+.mosaic-grid-caption > h2, 
+.mosaic-grid-caption > h3,
+.mosaic-grid-caption > h4,
+.mosaic-grid-caption > h5,
+.mosaic-grid-caption > h6 {
   margin: 0;
 }
 

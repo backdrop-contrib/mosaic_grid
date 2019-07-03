@@ -21,8 +21,10 @@
       <div class="mosaic-grid-loader">&nbsp</div>
       <?php print $item; ?>
       <?php if(!empty($captions[$i])): ?>
-        <div class="mosaic-grid-caption">
-          <?php print $captions[$i] ?>
+        <div class="mosaic-grid-overlay">
+          <div class="mosaic-grid-caption">
+            <?php print $captions[$i] ?>
+          </div>
         </div>
       <?php endif;?>
     </div>
