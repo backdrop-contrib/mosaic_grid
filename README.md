@@ -10,7 +10,7 @@ Here is a short list of features:
 - Captions that appear on mouse hover.
 - Ability to tweak caption style without writing extra CSS.
 - Ability to use rich text for captions (by adding text fields in views).
-- Five loader icon styles to choose from.
+- Several loader icon styles to choose from.
 
 
 Installation
