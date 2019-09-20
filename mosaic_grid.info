@@ -3,6 +3,6 @@ description = Provides views style plugin for building image galleries layed out
 backdrop = 1.x
 package = Views
 type = module
-version = 1.x-0.1-beta
+version = 1.x-1.0.0
 dependencies[] = views
 configure = admin/config/media/mosaic_grid
