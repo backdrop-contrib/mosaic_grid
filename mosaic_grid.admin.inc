@@ -110,6 +110,15 @@ function mosaic_grid_admin_form($form, &$form_state) {
       ),
     ),
   );
+  
+  $form['appearance']['show_empty_images'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show empty images'),
+    '#description' => t("Enable this to show empty space with warning for images
+      that have their file missing. By default such images are ignored and 
+      not displayed in the grid."),
+    '#default_value' => $config->get('show_empty_images'),
+  );
 
   $form['lazyload'] = array(
     '#type' => 'fieldset',
@@ -168,6 +177,7 @@ function mosaic_grid_admin_form_submit($form, &$form_state) {
   $config->set('caption_opacity',        $form_state['values']['caption_opacity']);
   $config->set('caption_padding',        $form_state['values']['caption_padding']);
   $config->set('caption_font_size',      $form_state['values']['caption_font_size']);
+  $config->set('show_empty_images',      $form_state['values']['show_empty_images']);
   $config->set('lazyload_enabled',       $form_state['values']['lazyload_enabled']);
   $config->set('lazyload_edgeY',         $form_state['values']['lazyload_edgeY']);
   

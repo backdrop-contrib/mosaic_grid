@@ -123,36 +123,46 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
 
     // Process each item(row).
     for($i = 0; $i < $rows; $i++) {
-      // Store rendered image field.
-      $items_rendered[] = $style_plugin->get_field($i, $image_field_name);
       // Get raw image fields value.
       $image_field_value = $style_plugin->get_field_value($i, $image_field_name);
-      // Calcualte image size ratio based on provided width and height.
-      // It is assumed that image field has a single value.
+      // Get width and height of an image. 
+      // It is assumed that image field has one value.
       $width  = $image_field_value[0]['width'];
       $height = $image_field_value[0]['height'];
-      $items_ratio[$i] = $width / $height;
-      
-      // If caption source is set then store captions.
-      switch($options['caption']) {
-        case 'alt':
-          $alt_value = $image_field_value[0]['alt'];
-          if(isset($alt_value) && $alt_value != '') {
-            $captions[$i] = '<p>' . $alt_value . '</p>';  
-          }
-          break;
-        case 'title':
-          $title_value = $image_field_value[0]['title'];
-          if(!empty($title_value)) {
-            $captions[$i] = '<p>' . $title_value . '</p>';  
-          }
-          break;
-        case 'text':
-          if(isset($text_field_name)){
-            // Assign rendered text field as caption.
-            $captions[$i] = $style_plugin->get_field($i, $text_field_name);
-          } 
-          break;
+      // Check that image width and height are not zero.
+      // Zero height/width may indicate that image file is missing. In that
+      // case just ignore it.
+      if($width > 0 && $height > 0) {
+        // Calcualte and store image size ratio.
+        $items_ratio[$i] = $width / $height;
+        // Store rendered image field.
+        $items_rendered[$i] = $style_plugin->get_field($i, $image_field_name);
+        
+        // If caption source is set then store captions.
+        switch($options['caption']) {
+          case 'alt':
+            $alt_value = $image_field_value[0]['alt'];
+            if(isset($alt_value) && $alt_value != '') {
+              $captions[$i] = '<p>' . $alt_value . '</p>';  
+            }
+            break;
+          case 'title':
+            $title_value = $image_field_value[0]['title'];
+            if(!empty($title_value)) {
+              $captions[$i] = '<p>' . $title_value . '</p>';  
+            }
+            break;
+          case 'text':
+            if(isset($text_field_name)){
+              // Assign rendered text field as caption.
+              $captions[$i] = $style_plugin->get_field($i, $text_field_name);
+            } 
+            break;
+        }
+      }
+      elseif ($config->get('show_empty_images')) {
+        $items_ratio[$i] = 1;
+        $items_rendered[$i] = FALSE;
       }
     }
   }
@@ -167,35 +177,51 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   $vars['items_rendered'] = $items_rendered;
   $vars['items_ratio']    = $items_ratio;
   $vars['captions']       = $captions;
+  // Generate unique id for the mosaic grid.
+  $vars['mosaic_id'] = 'mosaic-' . $view->name . '-' . $view->current_display;
+  // Store js plugins settings.
+  $vars['settings'] = array(
+    'max_row_height'                  => $options['max_row_height'],
+    'inner_gap'                       => $options['inner_gap'],
+    'outer_margin'                    => $options['outer_margin'],
+    'max_row_height_policy'           => $options['max_row_height_policy'],
+    'refit_on_resize'                 => $options['more']['refit_on_resize'],
+    'refit_on_resize_delay'           => $options['more']['refit_on_resize_delay'],
+    'max_rows'                        => $options['more']['max_rows'],
+    'responsive_width_threshold'      => $options['more']['responsive_width_threshold'],
+    'max_items_threshold_surpassed'   => $options['more']['max_items_threshold_surpassed'],
+    'show_tail_when_not_enough_items' => $options['more']['show_tail_when_not_enough_items'],
+    'caption_style_override'          => $config->get('caption_style_override'),
+  );
+  
+  // Create js settings array.
+  $js_settings = array (
+    'mosaic_grid' => array(
+      'lazyload_edgeY' => $config->get('lazyload_edgeY'),
+    ),
+  );
 
   // Get module's directory.
   $module_dir = backdrop_get_path('module', 'mosaic_grid');
 
-  // Add mosaic and lazy load jQuery libraries.
+  // Add Mosaic and lazyLoadXt jQuery libraries.
   backdrop_add_library('mosaic_grid', 'mosaic',     FALSE);
   backdrop_add_library('mosaic_grid', 'lazyloadxt', FALSE);
   
-  // Set module's script settings from the style plugin options and module configuration.
-  $js_settings = array (
-    'mosaic_grid' => array(
-      'max_row_height'                  => $options['max_row_height'],
-      'inner_gap'                       => $options['inner_gap'],
-      'outer_margin'                    => $options['outer_margin'],
-      'max_row_height_policy'           => $options['max_row_height_policy'],
-      'refit_on_resize'                 => $options['more']['refit_on_resize'],
-      'refit_on_resize_delay'           => $options['more']['refit_on_resize_delay'],
-      'max_rows'                        => $options['more']['max_rows'],
-      'responsive_width_threshold'      => $options['more']['responsive_width_threshold'],
-      'max_items_threshold_surpassed'   => $options['more']['max_items_threshold_surpassed'],
-      'show_tail_when_not_enough_items' => $options['more']['show_tail_when_not_enough_items'],
-      'lazyload_edgeY'                  => $config->get('lazyload_edgeY'),
-    ),
-  );
+  // Add settings and load js to initiate lazyLoad plugin.
   backdrop_add_js($js_settings, 'setting');
-  
-  // Load module's script and styles. 
-  // Script will launch the plugins with the proper settings.
   backdrop_add_js($module_dir . '/js/mosaic_grid.js');
+  
+  // Add script that initiates jquery Mosaic plugin to build the grid.
+  // Inline mode is used to ensure that script is added for every mosaic
+  // grid instance on a single page.
+  backdrop_add_js('$(function () {
+        $("#' . $vars['mosaic_id'] . '").Mosaic(); 
+      });',
+      'inline'
+  );
+  
+  // Load module's script and styles.
   backdrop_add_css($module_dir . '/css/mosaic_grid.css');
   
   // Check loader style setting.
