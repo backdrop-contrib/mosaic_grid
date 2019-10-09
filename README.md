@@ -37,7 +37,7 @@ https://github.com/backdrop-contrib/mosaic-grid/issues
 Known Issues
 ------------
 
-At some circumstances a broken grid is created. In that case try some of the following:
+At some circumstances a broken grid is generated. In that case try some of the following:
 - Clear cache: Home -> Flush all caches
 - Enable 'Refit on Resize' in Mosaic Grid formatter settings in case it was disabled.
 - Try a different image size for grid images (i.e. change image style).
