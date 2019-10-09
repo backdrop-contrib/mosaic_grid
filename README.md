@@ -39,13 +39,13 @@ Known Issues
 
 At some circumstances a broken grid is created. In that case try some of the following:
 - Clear cache: Home -> Flush all caches
-- Enable 'Refit on Resize' setting in case it was disabled.
-- Try different image size for grid images (i.e. change image style).
-- Try different layout. For instance try Boxton Hero instead of Boxton.
+- Enable 'Refit on Resize' in Mosaic Grid formatter settings in case it was disabled.
+- Try a different image size for grid images (i.e. change image style).
+- Try a different layout. For instance try Boxton Hero instead of Boxton.
 - If you are using customized flexible layout then try setting the container style to maximum or full width.
 - Try using a different Theme if you can.
 
-If non of above helps then please report your case here with as much details as possible:
+If non of the above helps then please report your case with as much details as possible:
 https://github.com/backdrop-contrib/mosaic_grid/issues/4
 
 Current Maintainers
