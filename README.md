@@ -46,7 +46,7 @@ At some circumstances a broken grid is generated. In that case try some of the f
 - Try using a different Theme if you can.
 
 If non of the above helps then please report your case with as much details as possible:
-https://github.com/backdrop-contrib/mosaic_grid/issues/4
+https://github.com/backdrop-contrib/mosaic_grid/issues/6
 
 Current Maintainers
 -------------------
