@@ -1,8 +1,7 @@
 Mosaic Grid
 ===========
 
-Mosaic Grid is a Views style plugin that allows to display images in a nice responsive justified grid.
-Best works as a single large full page image gallery but can also be used as a block and for creating multiple galleries on a single page.
+Mosaic Grid is a Views style plugin that allows to display images in a nice responsive justified grid. Best works as a single large full page image gallery but can also be used as a block and for creating multiple galleries on a single page.
 Here is a short list of features:
 
 - Justified responsive grid layout for images.
