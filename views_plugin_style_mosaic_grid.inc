@@ -12,22 +12,12 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
   function option_definition() {
     $options = parent::option_definition();
 
-    $options['max_row_height']                = array('default' => 400);
-    $options['inner_gap']                     = array('default' => 5  );
-    $options['outer_margin']                  = array('default' => 0  );
-    $options['caption']                       = array('default' => 'none');
-    $options['max_row_height_policy']         = array('default' => 'tail');
- 
-    $options['more']  = array (
-      'default' => array(
-        'refit_on_resize'                 => true,
-        'refit_on_resize_delay'           => 0,
-        'max_rows'                        => 0,
-        'responsive_width_threshold'      => 0,
-        'max_items_threshold_surpassed'   => 0,
-       ),
-    );
-    
+    $options['max_row_height'] = array('default' => 400);
+    $options['gap']            = array('default' => 2  );
+    $options['caption']        = array('default' => 'none');
+    $options['max_rows']       = array('default' => 0);
+    $options['truncate']       = array('default' => false);
+
     return $options;
   }
 
@@ -46,24 +36,14 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#default_value' => $this->options['max_row_height'], 
     );
     
-    $form['inner_gap'] = array (
-      '#title' => t('Inner Gap'),
-      '#description' => t('A gap size in pixels to leave a space between elements.'),
+    $form['gap'] = array (
+      '#title' => t('Gap'),
+      '#description' => t('Amount of space between items.'),
       '#type' => 'number',
       '#min' => 0,
-      '#max' => 9999,
-      '#field_suffix' => t('pix'),
-      '#default_value' => $this->options['inner_gap'], 
-    );
-    
-    $form['outer_margin'] = array (
-      '#title' => t('Outer Margin'),
-      '#description' => t('A margin size in pixels for the outher edge of the whole mosaic.'),
-      '#type' => 'number',
-      '#min' => 0,
-      '#max' => 9999,
-      '#field_suffix' => t('pix'),
-      '#default_value' => $this->options['outer_margin'], 
+      '#max' => 99,
+      //'#field_suffix' => t('pix'),
+      '#default_value' => $this->options['gap'], 
     );
     
     // Set options list for caption selector.
@@ -88,110 +68,21 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
         will work in captions.'),
     );
     
-    // Assign to variables so that options names can be reused in the description.
-    $tail     = t('Tail');
-    $skip     = t('Skip');
-    $crop     = t('Crop');
-    $oversize = t('Oversize');
-    
-    $form['max_row_height_policy'] = array(
-      '#type' => 'select',
-      '#title' => t('Maximum Row Height Policy'),
-      '#options' => array(
-        'tail'     => $tail,
-        'skip'     => $skip,
-        'crop'     => $crop,
-        'oversize' => $oversize,
-      ),
-      '#default_value' => $this->options['max_row_height_policy'],
-      '#description' => t('Defines behaviour for when the remaining items cannot be fitted on
-        a row without surpassing the maximum row height. For those cases, choose one of the
-        available settings:') . 
-        '<ul>' .
-        '<li>' . $tail .     ' - ' . t('Renders items respecting their aspect ratio without surpassing the specified Maximum Row Height, resulting in a last row that might not completely fit the screen horizontally.') . '</li>' .
-        '<li>' . $skip .     ' - ' . t('Does not renders the unfitting items.') . '</li>' .
-        '<li>' . $crop .     ' - ' . t('Caps the desired height to the specified Maximum Row Height, resulting in those items not keeping their aspect ratios.') . '</li>' .
-        '<li>' . $oversize . ' - ' . t('Renders items respecting their aspect ratio but surpassing the specified Maximum Row Height.') . '</li>' .
-        '</ul>',
-    );
-    
-    $form['more'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('More'),
-      '#collapsible' => TRUE,
-      '#collapsed' => TRUE,
-    );
-    
-    $form['more']['refit_on_resize'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Refit On Resize'),
-      '#description' => t("Whether to rebuild the mosaic when the window is resized or not."),
-      '#default_value' => $this->options['more']['refit_on_resize'],
-    );
-    
-    $form['more']['refit_on_resize_delay'] = array(
-      '#type' => 'number',
-      '#title' => t('Refit On Resize Delay'),
-      '#description' => t("Milliseconds to wait after a resize event to refit
-        the mosaic. Useful when creating huge mosaics that can take some CPU
-        time on the user's browser. Leave it to zero to refit the mosaic in
-        realtime."),
-      '#min' => 0,
-      '#max' => 9999,
-      '#default_value' => $this->options['more']['refit_on_resize_delay'],
-      '#field_suffix' => t('ms'),
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="style_options\[more\]\[refit_on_resize\]"]' => array('checked' => TRUE),
-        ),
-      ),
-    );
-    
-    $form['more']['max_rows'] = array (
+    $form['max_rows'] = array (
        '#title' => t('Maximum Rows Number'),
-       '#description' => t('If specified, the mosaic will not have more than
-         this number of rows. Zero value means all rows will be displayed.
-         If Responsive Width Threshold is specified(see below) then
-         Maximum Rows Number is not considered when the threshold has been
-         reached.'),
+       '#description' => t('Maximum number of rows to display. Items exceeding this
+          row are hidden.'),
        '#type' => 'number',
        '#min' => 0,
        '#max' => 9999,
-       '#default_value' => $this->options['more']['max_rows'], 
+       '#default_value' => $this->options['max_rows'], 
     );
     
-    $form['more']['responsive_width_threshold'] = array (
-      '#title' => t('Resposive Width Threshold'),
-      '#description' => t('If specified, when the width is less than this, the
-        mosaic building logic is not applied, and one item per row is always
-        shown. This might help you avoid resulting item sizes that are too small
-        and might break complex html/css inside them.'),
-      '#type' => 'number',
-      '#min' => 0,
-      '#max' => 9999,
-      '#field_suffix' => t('pix'),
-      '#default_value' => $this->options['more']['responsive_width_threshold'],
-      '#states' => array(
-        'enabled' => array(
-          ':input[name="style_options\[more\]\[refit_on_resize\]"]' => array('checked' => TRUE),
-        ),
-      ),
-    );
-    
-    $form['more']['max_items_threshold_surpassed'] = array (
-      '#title' => t('Max Items To Show When Responsive Threshold Surpassed'),
-      '#description' => t('If set (and also Responsive Width Threshold is set),
-        only this amount of items will be shown when the Responsive Width
-        Threshold is met.'),
-      '#type' => 'number',
-      '#min' => 0,
-      '#max' => 9999,
-      '#default_value' => $this->options['more']['max_items_threshold_surpassed'],
-      '#states' => array(
-        'disabled' => array(
-          ':input[name="style_options\[more\]\[responsive_width_threshold\]"]' => array('value' => 0),
-        ),
-      ),
+    $form['truncate'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Truncate'),
+      '#description' => t("Hide incomplete last row of items."),
+      '#default_value' => $this->options['truncate'],
     );
   }
   
