@@ -1,19 +1,25 @@
+.mosaic-grid-item {
+  margin: 3px;
+  float: left;
+  box-sizing: content-box;
+  overflow: hidden;
+  position: relative;
+  z-index: 100;
+  background-color: rgba(0,0,0,0.1);
+  border: unset;
+}
+
+.mosaic-grid-item img, video {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+
 .mosaic-grid-loader {
   position: absolute;
   left: 50%;
   top: 50%;
   z-index: -1;
-}
-
-.mosaic-grid-item {
-  position: relative;
-  z-index: 100;
-  background-color: rgba(0,0,0,0.1);
-}
-
-.mosaic-grid-item img, video {
-  min-width: 100%;
-  min-height: 100%;
 }
 
 .mosaic-grid-overlay {

@@ -33,17 +33,17 @@ function mosaic_grid_views_api() {
  * Implements hook_library_info().
  */
 function mosaic_grid_library_info() {
-  $libraries['mosaic'] = array(
-    'title' => 'Mosaic',
-    'website' => 'https://jquery-mosaic.tin.cat/',
-    'version' => '0.15.2',
+  $libraries['flexImages'] = array(
+    'title' => 'Flex Images',
+    'website' => 'https://goodies.pixabay.com/jquery/flex-images/demo.html',
+    'version' => '1.0.4',
     'js' => array(
-      backdrop_get_path('module', 'mosaic_grid') . '/library/jquery.mosaic.min.js' => array(
+      backdrop_get_path('module', 'mosaic_grid') . '/library/jquery.flex-images.min.js' => array(
         'weight' => 1,
       ),
     ),
     'css' => array(
-      backdrop_get_path('module', 'mosaic_grid') . '/library/jquery.mosaic.min.css' => array(),
+      backdrop_get_path('module', 'mosaic_grid') . '/library/jquery.flex-images.css' => array(),
     ),
   );
   
@@ -115,8 +115,9 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   if (isset($image_field_name)) {
     // Set arrays for storing data.
     $items_rendered = array();
-    $items_ratio    = array();
     $captions       = array();
+    $items_width    = array();
+    $items_height   = array();
     
     // Get number of items(rows).
     $rows = count($view->result);
@@ -130,11 +131,11 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
       $width  = $image_field_value[0]['width'];
       $height = $image_field_value[0]['height'];
       // Check that image width and height are not zero.
-      // Zero height/width may indicate that image file is missing. In that
-      // case just ignore it.
+      // Zero height/width may indicate that image file is missing.
       if($width > 0 && $height > 0) {
-        // Calcualte and store image size ratio.
-        $items_ratio[$i] = $width / $height;
+        // Store image dimentions.
+        $items_width[$i]  = $width;
+        $items_height[$i] = $height;
         // Store rendered image field.
         $items_rendered[$i] = $style_plugin->get_field($i, $image_field_name);
         
@@ -161,8 +162,10 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
         }
       }
       elseif ($config->get('show_empty_images')) {
-        $items_ratio[$i] = 1;
+        // Fill in values needed for empty image warning display.
         $items_rendered[$i] = FALSE;
+        $items_width[$i] = 100;
+        $items_height[$i] = 100;
       }
     }
   }
@@ -175,26 +178,15 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   
   // Store data in variables to be accessible by the template.
   $vars['items_rendered'] = $items_rendered;
-  $vars['items_ratio']    = $items_ratio;
   $vars['captions']       = $captions;
-  // Generate unique id for the mosaic grid.
+  $vars['width']          = $items_width;
+  $vars['height']         = $items_height;
+  // Generate and store unique id for the mosaic grid.
   $vars['mosaic_id'] = 'mosaic-' . $view->name . '-' . $view->current_display;
-  // Store js plugins settings.
-  $vars['settings'] = array(
-    'max_row_height'                  => $options['max_row_height'],
-    'inner_gap'                       => $options['inner_gap'],
-    'outer_margin'                    => $options['outer_margin'],
-    'max_row_height_policy'           => $options['max_row_height_policy'],
-    'refit_on_resize'                 => $options['more']['refit_on_resize'],
-    'refit_on_resize_delay'           => $options['more']['refit_on_resize_delay'],
-    'max_rows'                        => $options['more']['max_rows'],
-    'responsive_width_threshold'      => $options['more']['responsive_width_threshold'],
-    'max_items_threshold_surpassed'   => $options['more']['max_items_threshold_surpassed'],
-    'show_tail_when_not_enough_items' => $options['more']['show_tail_when_not_enough_items'],
-    'caption_style_override'          => $config->get('caption_style_override'),
-  );
+  // Store gap size.
+  $vars['gap'] = $options['gap'];
   
-  // Create js settings array.
+  // Create settings array for js.
   $js_settings = array (
     'mosaic_grid' => array(
       'lazyload_edgeY' => $config->get('lazyload_edgeY'),
@@ -204,25 +196,35 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   // Get module's directory.
   $module_dir = backdrop_get_path('module', 'mosaic_grid');
 
-  // Add Mosaic and lazyLoadXt jQuery libraries.
-  backdrop_add_library('mosaic_grid', 'mosaic',     FALSE);
+  // Add flexImages and lazyLoadXt jQuery libraries.
+  backdrop_add_library('mosaic_grid', 'flexImages',     FALSE);
   backdrop_add_library('mosaic_grid', 'lazyloadxt', FALSE);
   
   // Add settings and load js to initiate lazyLoad plugin.
   backdrop_add_js($js_settings, 'setting');
   backdrop_add_js($module_dir . '/js/mosaic_grid.js');
   
-  // Add script that initiates jquery Mosaic plugin to build the grid.
+  // Load module's styles.
+  backdrop_add_css($module_dir . '/css/mosaic_grid.css');
+
+  // Add script that initiates jquery plugin to build the grid.
   // Inline mode is used to ensure that script is added for every mosaic
   // grid instance on a single page.
-  backdrop_add_js('$(function () {
-        $("#' . $vars['mosaic_id'] . '").Mosaic(); 
-      });',
-      'inline'
-  );
+  $init_grid_js = <<<"JS"
+    $(function () {
+      $("#{$vars['mosaic_id']}").flexImages({
+          container: ".mosaic-grid-item",
+          object: "img",
+          rowHeight: {$options['max_row_height']},
+          maxRows: {$options['max_rows']},
+          truncate: {$options['truncate']}
+        });
+      });
+JS;
+  backdrop_add_js($init_grid_js, 'inline');
   
-  // Load module's script and styles.
-  backdrop_add_css($module_dir . '/css/mosaic_grid.css');
+  // Store the code so that it can be used by the template for views preview.
+  $vars['init_grid_js'] = $init_grid_js;
   
   // Check loader style setting.
   $loader_style = $config->get('loader_style');
@@ -233,6 +235,7 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     
     // Add color customisation as inline css.
     $color_hex = $config->get('loader_color');
+    $loader_css = false;
     switch($loader_style){
         case 'spinning_ring':
         case 'spinning_ring_thin':
@@ -243,7 +246,6 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
               border-left-color: {$color_hex};
             }
 SPIN;
-          backdrop_add_css($loader_css, array('type' => 'inline'));
           break;
 
         case 'floating_balls':
@@ -254,7 +256,6 @@ SPIN;
               color: {$color_hex};
             }
 SPIN;
-          backdrop_add_css($loader_css, array('type' => 'inline'));
           break;
         
         case 'vertical_blocks':
@@ -266,9 +267,10 @@ SPIN;
               color: {$color_hex};
             }
 SPIN;
-          backdrop_add_css($loader_css, array('type' => 'inline'));
           break;
       }
+      if($loader_css)
+        backdrop_add_css($loader_css, array('type' => 'inline'));
     }
 
   // Create style overrides if caption style is set to custom.
@@ -294,6 +296,8 @@ SPIN;
 CAP;
     // Add the css as inline style sheet.
     backdrop_add_css($custom_caption_css, array('type' => 'inline'));
+    // Store it for template. It will be used for views preview.
+    $vars['custom_caption_css'] = $custom_caption_css;
   }
 }
 
@@ -311,9 +315,9 @@ function mosaic_grid_preprocess_image(&$variables) {
   $lazyload = config_get('mosaic_grid.settings', 'lazyload_enabled');
   if(!$lazyload) return;
   
-  // Change src attribute to blank image and assign actual image url to data-src.
+  // Change src attribute to blank image and assign actual image url to lazy-src.
   // This is required for lazy loading js plugin to work.
   $path_or_uri = $variables['uri'] ? $variables['uri'] : $variables['path'];
-  $variables['attributes']['data-src'] = file_create_url($path_or_uri);
+  $variables['attributes']['lazy-src'] = file_create_url($path_or_uri);
   $variables['attributes']['src'] = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 }

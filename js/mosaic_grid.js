@@ -8,6 +8,8 @@
     attach: function (context, settings) {
       $.extend($.lazyLoadXT, {
         edgeY:  settings.mosaic_grid.lazyload_edgeY,
+        selector: 'img[lazy-src]',
+        srcAttr: 'lazy-src',
         
         // Modified onload function that removes loader.
         onload: function() {
@@ -15,14 +17,11 @@
           $(this).removeClass('lazy-hidden');
           $(this).addClass('lazy-loaded');
           // Seek for item DIV that should be a parent for the image.
-          var itemDiv = $(this).parent();
-          if(!itemDiv.hasClass('mosaic-grid-item')) {
-            // In case image(IMG) is wrapped in a link(A) we need 
-            // to move one step higher in hierarchy.
-            itemDiv = itemDiv.parent();
+          var itemDiv = $(this).parents('div.mosaic-grid-item');
+          if(itemDiv) {
+            // Delete loader DIV that is a children of the item DIV.
+            itemDiv.children('.mosaic-grid-loader').remove();
           }
-          // Delete loader DIV that is a children of the item.
-          itemDiv.children('.mosaic-grid-loader').remove();
         },
       });
     }      
