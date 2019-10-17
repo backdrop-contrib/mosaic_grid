@@ -30,6 +30,11 @@ Issues
 Bugs and Feature requests should be reported in the Issue Queue:
 https://github.com/backdrop-contrib/mosaic-grid/issues
 
+Known Issues
+------------
+
+In rare cases the grid can be generated in a wrong way. If that happens then you may try changing either Gap or Max Row Height parameters. Usually 1-2 pixel change is enough to get rid of the problem.
+
 Current Maintainers
 -------------------
 
