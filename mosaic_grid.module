@@ -315,7 +315,7 @@ function mosaic_grid_preprocess_image(&$variables) {
   $lazyload = config_get('mosaic_grid.settings', 'lazyload_enabled');
   if(!$lazyload) return;
   
-  // Change src attribute to blank image and assign actual image url to data-src.
+  // Change src attribute to blank image and assign actual image url to lazy-src.
   // This is required for lazy loading js plugin to work.
   $path_or_uri = $variables['uri'] ? $variables['uri'] : $variables['path'];
   $variables['attributes']['lazy-src'] = file_create_url($path_or_uri);
