@@ -1,7 +1,7 @@
 Mosaic Grid
 ===========
 
-Mosaic Grid is a Views style plugin that allows to display images in a nice responsive justified grid. Best works as a single large full page image gallery but can also be used as a block and for creating multiple galleries on a single page. Here is a short list of features:
+Mosaic Grid is a Views style plugin that allows to display images in a nice responsive justified grid. Best works as a single large full page image gallery but can also be used as a block and for creating multiple galleries on a page. Here is a short list of features:
 
 - Justified responsive grid layout for images.
 - Optimised image loading (lazy loading).
@@ -33,7 +33,7 @@ https://github.com/backdrop-contrib/mosaic-grid/issues
 Known Issues
 ------------
 
-In rare cases the grid can be generated in a wrong way. If that happens then you may try changing either Gap or Maximum Row Height setting. Usually 1-2 pixel change is enough to get rid of the problem.
+In rare cases the grid can be generated in a wrong way. If that happens then try different values for Maximum Row Height setting.
 
 Current Maintainers
 -------------------
