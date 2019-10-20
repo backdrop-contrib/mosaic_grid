@@ -6,11 +6,10 @@
  * - $items_rendered     array of images to display.
  * - $width              array containing width of each image.
  * - $height             array containing height of each image.
- * - $captions           array with captions for images.
+ * - $captions           array with captions for images or FALSE if no captions set.
  * - $mosaic_id          unique id for this grid instance.
  * - $gap                size of space between images.
- * - $custom_caption_css styles for customized captions. Only needed for preview mode.
- * - $init_grid_js       grid initializing script with parameters. Only needed for preview mode.
+ * - $custom_caption_css styles for customized captions. Only required for preview mode.
  *
  * @ingroup views_templates
  */
@@ -20,6 +19,9 @@
 <style>
 <?php print $custom_caption_css; ?>
 </style>
+<script>
+  $(window).lazyLoadXT({show: true});
+</script>
 <?php endif; ?>
 
 <?php if (!empty($title)) : ?>
@@ -45,10 +47,3 @@
     </div>
   <?php endforeach; ?>
 </div>
-
-<?php if($view -> editing): ?> 
-<script>
-  <?php print $init_grid_js; ?>
-  $(window).lazyLoadXT({show: true});
-</script>
-<?php endif; ?>
