@@ -17,7 +17,12 @@
 
 <?php if($view->editing): ?>
 <style>
-<?php print $custom_caption_css ?>
+<?php
+print $custom_caption_css;
+if($loader_css):
+  print $loader_css;
+endif;
+?>
 </style>
 <?php endif; ?>
 
