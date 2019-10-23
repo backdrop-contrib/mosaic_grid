@@ -9,7 +9,7 @@
 
       for(var i in settings.mosaic_grid) {
         if(i == 'lazyload') {
-          // In views preview force start lazyload.
+          // In views preview force start lazyLoadXT.
           if(settings.mosaic_grid.lazyload.editing){
             $(window).lazyLoadXT();
           }
