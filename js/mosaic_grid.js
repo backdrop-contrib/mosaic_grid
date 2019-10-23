@@ -11,7 +11,7 @@
         if(i == 'lazyload') {
           // In views preview force start lazyload.
           if(settings.mosaic_grid.lazyload.editing){
-            //$(window).lazyLoadXT();
+            $(window).lazyLoadXT();
           }
           // Configure lazyLoadXT.
           $.extend($.lazyLoadXT, {
