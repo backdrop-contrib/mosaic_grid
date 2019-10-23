@@ -17,6 +17,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
     $options['caption']        = array('default' => 'none');
     $options['max_rows']       = array('default' => 0);
     $options['truncate']       = array('default' => false);
+    $options['hide_empty']     = array('default' => true);
 
     return $options;
   }
@@ -84,6 +85,13 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#title' => t('Truncate'),
       '#description' => t("Hide incomplete last row of items."),
       '#default_value' => $this->options['truncate'],
+    );
+    
+    $form['hide_empty'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Hide empty fields'),
+      '#description' => t("Do not display items that are empty."),
+      '#default_value' => $this->options['hide_empty'],
     );
   }
   

@@ -168,7 +168,7 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
             break;
         }
       }
-      elseif ($config->get('show_empty_images')) {
+      elseif (empty($options['hide_empty'])) {
         // Fill in values needed for empty image warning display.
         $items_rendered[$i] = FALSE;
         $items_width[$i] = 100;
@@ -199,6 +199,7 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     'mosaic_grid' => array(
       'lazyload' => array(
         'edgeY'          => $config->get('lazyload_edgeY'),
+        'editing'        => $view->editing,
       ),
       $mosaic_id => array (
         'max_row_height' => $options['max_row_height'],
@@ -260,13 +261,14 @@ SPIN;
             .mosaic-grid-loader:before,
             .mosaic-grid-loader:after {
               background: {$color_hex};
-              color: {$color_hex};
-            }
+              color: {$color_hex};}
 SPIN;
           break;
       }
       if($loader_css)
+        $loader_css = minify($loader_css);
         backdrop_add_css($loader_css, array('type' => 'inline'));
+      $vars['loader_css'] = $loader_css;
     }
 
   // Create style overrides if caption style is set to custom.
@@ -291,10 +293,18 @@ SPIN;
       }
 CAP;
     // Add the css as inline style sheet.
+    $custom_caption_css = minify($custom_caption_css);
     backdrop_add_css($custom_caption_css, array('type' => 'inline'));
     // Store it for template. It will be used for views preview.
     $vars['custom_caption_css'] = $custom_caption_css;
   }
+}
+
+/*
+ * Removes unnesessary symbols from code string.
+ */
+function minify($string){
+  return str_replace(array(" ", "\r", "\n"), '', $string);
 }
 
 
