@@ -1,7 +1,7 @@
 {
   "_config_name": "mosaic_grid.settings",
   "loader_style": "spinning_ring",
-  "loader_color": "#cccccc",
+  "loader_color": "#eeeeee",
   "caption_style_override": false,
   "caption_font_color": "#ffffff",
   "caption_opacity": 50,
