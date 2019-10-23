@@ -17,11 +17,8 @@
 
 <?php if($view->editing): ?>
 <style>
-<?php print $custom_caption_css; ?>
+<?php print $custom_caption_css ?>
 </style>
-<script>
-  $(window).lazyLoadXT({show: true});
-</script>
 <?php endif; ?>
 
 <?php if (!empty($title)) : ?>

@@ -9,6 +9,10 @@
 
       for(var i in settings.mosaic_grid) {
         if(i == 'lazyload') {
+          // In views preview force start lazyload.
+          if(settings.mosaic_grid.lazyload.editing){
+            //$(window).lazyLoadXT();
+          }
           // Configure lazyLoadXT.
           $.extend($.lazyLoadXT, {
             edgeY:    settings.mosaic_grid.lazyload.edgeY,
@@ -25,7 +29,7 @@
                 itemDiv.children('.mosaic-grid-loader').remove();
               }
             },
-          });
+          }); 
         }
         else {
           // Initiate grid on a page.
@@ -39,7 +43,7 @@
           });
         }
       }
-      
+
     }      
   };
   
