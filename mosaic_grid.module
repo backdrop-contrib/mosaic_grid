@@ -199,7 +199,6 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     'mosaic_grid' => array(
       'lazyload' => array(
         'edgeY'          => $config->get('lazyload_edgeY'),
-        'editing'        => $view->editing,
       ),
       $mosaic_id => array (
         'max_row_height' => $options['max_row_height'],
