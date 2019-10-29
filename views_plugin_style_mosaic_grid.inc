@@ -89,8 +89,8 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
     
     $form['hide_empty'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Hide empty fields'),
-      '#description' => t("Do not display items that are empty."),
+      '#title' => t('Hide empty images'),
+      '#description' => t("Do not display images with missing files."),
       '#default_value' => $this->options['hide_empty'],
     );
   }
