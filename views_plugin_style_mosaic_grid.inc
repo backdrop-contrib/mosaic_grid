@@ -111,7 +111,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
     );
 
     $caption_display = array(
-      'hover'  => t('Appear on mouse over'),
+      'hover'  => t('Appear on mouse hover'),
       'static' => t('Placed over image bottom'),
     );
 
