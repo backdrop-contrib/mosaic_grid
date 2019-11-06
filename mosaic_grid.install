@@ -5,7 +5,7 @@
  */
 
 /**
- * Implements hook_disable.
+ * Implements hook_disable().
  */
 function mosaic_grid_disable() {
   // Check any views have their style plugin set to Mosaic Grid.
@@ -27,7 +27,7 @@ function mosaic_grid_disable() {
   }
 
   if (!empty($warnings)) {
-    $message = t('The following Views displays are using the Mosaic Grid plugin, which is no longer enabled. 
+    $message = t('The following Views displays are using the Mosaic Grid plugin, which is no longer enabled.
     It is recommended that you update these displays, otherwise they will not work properly. Links open in a new window.');
     $message .= '<ul><li>' . join('</li><li>', $warnings) . '</li></ul>';
     backdrop_set_message($message, 'warning');

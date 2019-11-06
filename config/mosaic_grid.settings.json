@@ -4,9 +4,10 @@
   "loader_color": "#aaaaaa",
   "caption_style_override": false,
   "caption_font_color": "#ffffff",
+  "caption_background_color": "000000",
   "caption_opacity": 50,
-  "caption_font_size": 12,
-  "caption_padding": 10,
+  "caption_font_size": 1,
+  "caption_padding": 0.5,
   "lazyload_enabled": true,
   "lazyload_edgeY": 0
 }
