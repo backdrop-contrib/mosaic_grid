@@ -18,11 +18,11 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
     $options['hide_empty']           = array('default' => TRUE);
     $options['captions']             = array(
       'default' => array(
-        'source'       => array('default' => '' ),
-        'display'      => array('default' => 'hover'),
-        'height'       => array('default' => 'auto' ),
-        'height_value' => array('default' => 2),
-        'no_padding_h' => array('default' => FALSE  ),
+        'source'       => '',
+        'display'      => 'hover',
+        'height'       => 'auto',
+        'height_value' => 2.0,
+        'no_padding_h' => FALSE,
       ),
     );
 
