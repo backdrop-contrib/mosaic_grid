@@ -5,7 +5,7 @@ Mosaic Grid is a Views style plugin that allows to display images in a nice resp
 
 - Justified responsive grid layout for images.
 - Optimised image loading (lazy loading).
-- Captions that appear on mouse hover or static over the image bottom.
+- Captions that appear over the image bottom, either statically, or on mouse hover.
 - Ability to tweak caption style without writing extra CSS.
 - Ability to use rich text for captions (by adding text fields in views).
 - Several loader icon styles to choose from.
