@@ -155,7 +155,6 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
       $image_field_value = $style_plugin->get_field_value($i, $image_field_name);
       // Get width and height of an image. It is assumed that image field has
       // one value.
-      // It is assumed that image field has one value.
       $width  = $image_field_value[0]['width'];
       $height = $image_field_value[0]['height'];
       // Check that image width and height are not zero.
