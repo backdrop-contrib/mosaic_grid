@@ -56,7 +56,7 @@ function mosaic_grid_admin_form($form, &$form_state) {
 
   $form['appearance']['caption_font_color'] = array(
     '#type' => 'color',
-    '#title' => t('Caption Font Color'),
+     '#title' => t('Caption font color'),
     '#description' => t("Sets caption font color."),
     '#default_value' => $config->get('caption_font_color'),
     '#states' => array(
