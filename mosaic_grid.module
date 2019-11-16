@@ -250,7 +250,7 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   // configuration, and module options.
   $custom_css = '';
 
-  // If one of the loader styles selected then add it's css file.
+  // If one of the loader styles selected then add it's CSS file.
   if (!empty($loader_style)) {
     backdrop_add_css($module_dir . '/css/mosaic_grid_loader_' . $loader_style . '.css');
 
@@ -259,10 +259,10 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     switch ($loader_style) {
         case 'spinning_ring':
         case 'spinning_ring_thin':
-          $c = Color::hexToRgb($color_hex);
+          $color = Color::hexToRgb($color_hex);
           $custom_css = "
             .mosaic-grid-loader {
-              border-color: rgba({$c['red']}, {$c['green']}, {$c['blue']}, 0.2);
+              border-color: rgba({$color['red']}, {$color['green']}, {$color['blue']}, 0.2);
               border-left-color: {$color_hex};
             }";
           break;
@@ -302,7 +302,7 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   // Create style overrides if caption style is set to custom.
   if ($config->get('caption_style_override')) {
     // Get settings for caption style.
-    $color       = $config->get('caption_font_color');
+    $font_color  = $config->get('caption_font_color');
     $bg_color    = $config->get('caption_background_color');
     $opacity     = $config->get('caption_opacity') / 100;
     $font_size   = $config->get('caption_font_size');
@@ -310,17 +310,17 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     $padding_h   = $options['captions']['no_padding_h'] ? 0 : $padding * 1.5;
 
     // Convert hex color value to rgb components.
-    $c = Color::hexToRgb($bg_color);
+    $color = Color::hexToRgb($bg_color);
     // Create css with inserted values.
     $custom_css .= "
       .mosaic-grid-caption {
-        color: {$color};
-        background: rgba({$c['red']}, {$c['green']}, {$c['blue']}, {$opacity});
+        color: {$font_color};
+        background: rgba({$color['red']}, {$color['green']}, {$color['blue']}, {$opacity});
         font-size: {$font_size}em;
         {$height}
       }
       .mosaic-grid-caption > * {
-        color: {$color} !important;
+        color: {$font_color} !important;
         padding: {$padding}em {$padding_h}em;
       }";
   }
