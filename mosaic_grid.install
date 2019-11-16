@@ -8,7 +8,8 @@
  * Implements hook_disable().
  */
 function mosaic_grid_disable() {
-  // Check any views have their style plugin set to Mosaic Grid.
+  // Check if any views have their style plugin set to Mosaic Grid. If so, show
+  // a warning when disabling the module.
   // If so, offer a warning about disabling the module.
   $warnings = array();
   foreach (views_get_all_views() as $view) {
