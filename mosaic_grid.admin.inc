@@ -90,10 +90,7 @@ function mosaic_grid_admin_form($form, &$form_state) {
   $form['appearance']['caption_font_size'] = array(
     '#type' => 'number',
     '#title' => t('Caption font size'),
-    '#description' => t(
-      'Relative (<a href="@link" target="_blank">em</a>) units are used. <em>1em</em> means caption font size is equal to the font size defined by the theme.',
-       array('@link' => url('https://en.wikipedia.org/wiki/Em_(typography)'))
-    ),
+    '#description' => t('Relative (<a href="@link" target="_blank">em</a>) units are used. <em>1em</em> means caption font size is equal to the font size defined by the theme.', array('@link' => url('https://en.wikipedia.org/wiki/Em_(typography)'))),
     '#default_value' => $config->get('caption_font_size'),
     '#min'  => 0.1,
     '#max'  => 10,
@@ -109,10 +106,7 @@ function mosaic_grid_admin_form($form, &$form_state) {
   $form['appearance']['caption_padding'] = array(
     '#type' => 'number',
     '#title' => t('Caption padding'),
-    '#description' => t(
-      'Sets the size of the space around the caption text. Relative (<a href="@link" target="_blank">em</a>) units are used, which means that the actual padding size depends on the font size, as defined in the field above.',
-      array('@link' => url('https://en.wikipedia.org/wiki/Em_(typography)'))
-    ),
+    '#description' => t('Sets the size of the space around the caption text. Relative (<a href="@link" target="_blank">em</a>) units are used, which means that the actual padding size depends on the font size, as defined in the field above.', array('@link' => url('https://en.wikipedia.org/wiki/Em_(typography)'))),
     '#default_value' => $config->get('caption_padding'),
     '#min'  => 0,
     '#max'  => 10,
