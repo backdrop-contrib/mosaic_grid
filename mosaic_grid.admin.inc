@@ -47,9 +47,7 @@ function mosaic_grid_admin_form($form, &$form_state) {
   $form['appearance']['caption_style_override'] = array(
     '#type' => 'checkbox',
     '#title' => t('Customize caption style'),
-    '#description' => t("Enables changing caption size and colors. This will
-      override style provided by the theme. Uncheck if you would like the theme
-      to control caption style."),
+    '#description' => t("Enables changing caption size and colors. This will override style provided by the theme. Uncheck if you would like the theme to control caption style."),
     '#default_value' => $config->get('caption_style_override'),
   );
 
