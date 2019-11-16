@@ -36,7 +36,6 @@ function mosaic_grid_admin_form($form, &$form_state) {
   $form['appearance']['loader_color'] = array(
     '#type' => 'color',
     '#title' => t('Loader Color'),
-    '#description' => t("Sets loader color."),
     '#default_value' => $config->get('loader_color'),
     '#states' => array(
       'invisible' => array(
@@ -56,8 +55,7 @@ function mosaic_grid_admin_form($form, &$form_state) {
 
   $form['appearance']['caption_font_color'] = array(
     '#type' => 'color',
-     '#title' => t('Caption font color'),
-    '#description' => t("Sets caption font color."),
+    '#title' => t('Caption font color'),
     '#default_value' => $config->get('caption_font_color'),
     '#states' => array(
       'visible' => array(
@@ -69,7 +67,6 @@ function mosaic_grid_admin_form($form, &$form_state) {
   $form['appearance']['caption_background_color'] = array(
     '#type' => 'color',
     '#title' => t('Caption background color'),
-    '#description' => t("Sets caption background color."),
     '#default_value' => $config->get('caption_background_color'),
     '#states' => array(
       'visible' => array(
@@ -80,8 +77,7 @@ function mosaic_grid_admin_form($form, &$form_state) {
 
   $form['appearance']['caption_opacity'] = array(
     '#type' => 'number',
-    '#title' => t('Caption Background Opacity'),
-    '#description' => t("Sets caption background opacity."),
+    '#title' => t('Caption background opacity'),
     '#default_value' => $config->get('caption_opacity'),
     '#min' => 0,
     '#max' => 100,
