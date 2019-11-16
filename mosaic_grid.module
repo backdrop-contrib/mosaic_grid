@@ -111,8 +111,7 @@ function mosaic_grid_views_pre_render(&$view) {
         $views_human_name = $themes[$views_theme_name]->info['name'];
         $default_human_name = $themes[$default_theme_name]->info['name'];
         backdrop_set_message(
-          t("This preview uses styles from theme %admin. Make sure to check the final look of captions with your site's default theme (%default).",
-          array('%admin' => $views_human_name, '%default' => $default_human_name)),
+          t("This preview uses styles from theme %admin. Make sure to check the final look of captions with your site's default theme (%default).", array('%admin' => $views_human_name, '%default' => $default_human_name)),
           'warning'
         );
       }
