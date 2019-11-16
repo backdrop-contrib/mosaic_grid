@@ -102,13 +102,13 @@ function mosaic_grid_views_pre_render(&$view) {
     if (!empty($options['captions']['source'])) {
       // Get deafault and views theme names.
       $default_theme_name = config_get('system.core', 'theme_default');
-      $views_theme_name   = config_get('views_ui.settings', 'custom_theme');
+      $views_theme_name = config_get('views_ui.settings', 'custom_theme');
       if ($views_theme_name == '_default')
         $views_theme_name = config_get('system.core', 'admin_theme');
       // Show warning if views and default themes are not the same.
       if ($views_theme_name != $default_theme_name) {
         $themes = list_themes();
-        $views_human_name   = $themes[$views_theme_name  ]->info['name'];
+        $views_human_name = $themes[$views_theme_name]->info['name'];
         $default_human_name = $themes[$default_theme_name]->info['name'];
         backdrop_set_message(
           t("This preview uses styles from theme %admin. Make sure to check the final look of captions with your site's default theme (%default).",
@@ -154,7 +154,8 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     for ($i = 0; $i < $rows; $i++) {
       // Get raw image fields value.
       $image_field_value = $style_plugin->get_field_value($i, $image_field_name);
-      // Get width and height of an image.
+      // Get width and height of an image. It is assumed that image field has
+      // one value.
       // It is assumed that image field has one value.
       $width  = $image_field_value[0]['width'];
       $height = $image_field_value[0]['height'];
@@ -245,8 +246,8 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   // Check loader style setting.
   $loader_style = $config->get('loader_style');
 
-  // The rest of the function code below generates customized css
-  // based on configuration and module options.
+  // The rest of the function code below generates customized CSS, based on
+  // configuration, and module options.
   $custom_css = '';
 
   // If one of the loader styles selected then add it's css file.
@@ -292,7 +293,7 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   switch ($options['captions']['height']) {
     case 'fixed':
       $height .= 'height: ' . $options['captions']['height_value'] . 'em;';
-      // Inrentionally no break here. Max-height is needed anyway.
+      // Intentionally no break here. Max-height is needed anyway.
     case 'limit':
       $height .= 'max-height: ' . $options['captions']['height_value'] . 'em;';
       break;
