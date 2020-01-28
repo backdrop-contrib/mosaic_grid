@@ -7,8 +7,6 @@
 /**
  * Implements hook_views_plugins().
  */
- 
-
 function mosaic_grid_views_plugins() {
   return array(
     'style' => array(

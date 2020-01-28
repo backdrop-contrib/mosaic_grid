@@ -34,11 +34,14 @@
 }
 
 .mosaic-grid-caption {
+  display: table;
   position: absolute;
-  left: 0px; right: 0px; bottom: 0px;
+  width: 100%;
+  bottom: 0px;
   z-index: 102;
-  padding: 5pt 8pt;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 1);
+  overflow: hidden;
+  pointer-events: auto;
 }
 
 .mosaic-grid-item:hover > .mosaic-grid-overlay {
@@ -46,7 +49,8 @@
 }
 
 .mosaic-grid-caption > * {
-  margin: 0;
+  display: table-cell;
+  padding: 0.5em;
 }
 
 .mosaic-grid-empty {
@@ -58,7 +62,7 @@
 
 /* hide captions on small and touch screens */
 @media only screen and (max-width: 992px), (any-hover: none) {
-  .mosaic-grid-caption {
+  .mosaic-grid-hide-mobile {
     display: none;
   }
 }
