@@ -30,3 +30,10 @@ function mosaic_grid_disable() {
     backdrop_set_message($message, 'warning');
   }
 }
+
+/**
+ * Adds caption background color to the configuration file of Mosaic Grid module.
+ */
+function mosaic_grid_update_1200() {
+  config_set('mosaic_grid.settings', 'caption_background_color', '#000000');
+}
