@@ -182,8 +182,13 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
             break;
           case 'text':
             if (isset($text_field_name)) {
-              // Assign rendered text field as caption.
-              $captions[$i] = $style_plugin->get_field($i, $text_field_name);
+              // Get text field as caption.
+              $text = $style_plugin->get_field($i, $text_field_name);
+              // If text is not html then wrap it in <p> tags. This is required for proper styling.
+              if ($text == strip_tags($text)) {
+                $text = '<p>' . $text . '</p>';
+              }
+              $captions[$i] = $text;
             }
             break;
         }
@@ -257,7 +262,13 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     switch ($loader_style) {
         case 'spinning_ring':
         case 'spinning_ring_thin':
-          $color = Color::hexToRgb($color_hex);
+          // Check if color is a valid hex color and convert it to rgb.
+          if (Color::validateHex($color_hex)) {
+            $color = Color::hexToRgb($color_hex);
+          }
+          else {
+            $color = Color::hexToRgb('#ffffff');
+          }
           $custom_css = "
             .mosaic-grid-loader {
               border-color: rgba({$color['red']}, {$color['green']}, {$color['blue']}, 0.2);
@@ -307,8 +318,13 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     $padding     = $config->get('caption_padding');
     $padding_h   = $options['captions']['no_padding_h'] ? 0 : $padding * 1.5;
 
-    // Convert hex color value to rgb components.
-    $color = Color::hexToRgb($bg_color);
+    // Check if background color is a valid hex color and convert it to rgb.
+    if (Color::validateHex($bg_color)) {
+      $color = Color::hexToRgb($bg_color);
+    }
+    else {
+      $color = Color::hexToRgb('#000000');
+    }
     // Create css with inserted values.
     $custom_css .= "
       .mosaic-grid-caption {

@@ -30,3 +30,15 @@ function mosaic_grid_disable() {
     backdrop_set_message($message, 'warning');
   }
 }
+
+/**
+ * Configuration file update for Mosaic Grid module.
+ */
+function mosaic_grid_update_1200() {
+  $config = config('mosaic_grid.settings');
+  $config->set('caption_background_color', '#000000');
+  $config->set('caption_font_size', 1);
+  $config->set('caption_padding', 0.5);
+  $config->save();
+}
+
