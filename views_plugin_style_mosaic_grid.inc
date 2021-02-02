@@ -205,12 +205,19 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       // Ignore excluded fields.
       if (!empty($field->options['exclude']))
         continue;
-      $type = $field->field_info['type'];
-      // If it is of required type, return field handler and field name.
-      // Title has no field_info, so add a second condition.
-      if ($field_type == $type || ($field_type == 'title' && $field_name == 'title')) {
-        return array('handler' => $field, 'field_name' => $field_name);
+
+      if (isset($field->field_info) || $field_type == 'title') {
+        $type = FALSE;
+        if (!empty($field->field_info['type'])) {
+          $type = $field->field_info['type'];
+        }
+        // If it is of required type, return field handler and field name.
+        // Title has no field_info, so add a second condition.
+        if ($field_type == $type || ($field_type == 'title' && $field_name == 'title')) {
+          return array('handler' => $field, 'field_name' => $field_name);
+        }
       }
+
     }
     return NULL;
   }
@@ -273,7 +280,12 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       }
 
       // Check field type.
-      $field_type = $field->field_info['type'];
+      if (isset($field->field_info['type'])) {
+        $field_type = $field->field_info['type'];
+      }
+      elseif ($field->field == 'title') {
+        $field_type = 'title';
+      }
       $is_image = $field_type == 'image';
       $is_text = in_array($field_type, $this->get_text_field_types());
       $is_title = $field_name == 'title';

@@ -14,7 +14,7 @@
  */
 ?>
 
-<?php if($view->preview): ?>
+<?php if(isset($view->preview)): ?>
 <style>
 <?php print $custom_css;?>
 </style>
