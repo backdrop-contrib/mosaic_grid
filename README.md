@@ -28,7 +28,7 @@ Issues
 ------
 
 Bugs and Feature requests should be reported in the Issue Queue:
-https://github.com/backdrop-contrib/mosaic-grid/issues
+https://github.com/backdrop-contrib/mosaic_grid/issues
 
 Known Issues
 ------------
