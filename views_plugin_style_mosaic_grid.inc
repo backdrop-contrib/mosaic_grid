@@ -20,7 +20,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       'default' => array(
         'source'       => '',
         'display'      => 'hover',
-        'height'       => array (
+        'height'       => array(
           'option' => 'auto',
           'value'  => 2.0,
         ),
@@ -130,21 +130,21 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#markup' => t('Height'),
       '#suffix' => '</label>',
     );
-    
+
     // Container for inline placement of the next two fields.
     $form['captions']['height'] = array(
       '#type' => 'container',
-      '#attributes' => array (
+      '#attributes' => array(
         'class' => 'container-inline',
       ),
     );
-    
+
     $caption_height_options = array(
       'auto'  => t('Automatic'),
       'limit' => t('Automatic, up to specific limit'),
       'fixed' => t('Specific, fixed height'),
     );
-    
+
     $form['captions']['height']['option'] = array(
       '#type' => 'select',
       '#options' => $caption_height_options,
