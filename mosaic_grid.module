@@ -339,14 +339,11 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   $height = '';
   switch ($options['captions']['height']['option']) {
     case 'fixed':
-    $height .= '/*fixed*/';
-    $height .= 'display: block;';
+      $height .= 'display: block;';
       $height .= 'height: ' . $options['captions']['height']['value'] . 'em;';
-    $height .= 'max-height: ' . $options['captions']['height']['value'] . 'em;';
-    break;
-      // Intentionally no break here. Max-height is needed anyway.
+      $height .= 'max-height: ' . $options['captions']['height']['value'] . 'em;';
+      break;
     case 'limit':
-    $height .= '/*limit*/';
       $height .= 'max-height: ' . $options['captions']['height']['value'] . 'em;';
       break;
   }
