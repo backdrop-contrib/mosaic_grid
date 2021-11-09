@@ -5,3 +5,8 @@ package = Views
 type = module
 dependencies[] = views
 configure = admin/config/media/mosaic_grid
+
+; Added by Backdrop CMS packaging script on 2021-03-23
+project = mosaic_grid
+version = 1.x-2.1.3
+timestamp = 1616528825
