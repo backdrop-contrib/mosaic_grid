@@ -119,6 +119,7 @@ function mosaic_grid_views_pre_render(&$view) {
   }
 }
 
+
 /**
  * Preprocess function for module's template views_view_mosaic-grid.tpl.php.
  * Contains most of the module's logic.
@@ -133,9 +134,34 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   $config  = config('mosaic_grid.settings');
   $options = $vars['options'];
 
-  // Find names of the image and body fields handlers.
+  // Get image field settings and formatter type.
+  $image_field = $style_plugin->get_first_non_excluded_image_field();
+  $image_field_formatter = $image_field['handler']->options['type'];
+  $image_field_settings  = $image_field['handler']->options['settings'];
+
+  // Try to get image field style based on formatter type.
+  if (isset($image_field_formatter)) {
+    switch ($image_field_formatter) {
+      case 'image':
+        $image_style = $image_field_settings['image_style'];
+        break;
+      case 'photoswipe':
+        $image_style = $image_field_settings['photoswipe_node_style'];
+        break;
+      case 'colorbox':
+        $image_style = $image_field_settings['colorbox_node_style'];
+        break;
+      case 'featherlight':
+        $image_style = $image_field_settings['featherlight_image_style_content'];
+        break;
+      default:
+        $image_style = '';
+    }
+  }
+
+  // Find names of the image and text fields handlers.
   // These are needed to retrieve fields raw and rendered data.
-  $image_field_name = $style_plugin->get_first_non_excluded_image_field()['field_name'];
+  $image_field_name = $image_field['field_name'];
   $text_field_name  = $style_plugin->get_first_non_excluded_text_field()['field_name'];
 
   // Get and process all the required data for image display.
@@ -156,10 +182,19 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
       if (empty($image_field_value)) {
         continue;
       }
+
       // Get width and height of an image. It is assumed that image field has
       // one value.
       $width  = $image_field_value[0]['width'];
       $height = $image_field_value[0]['height'];
+
+      if (!empty($image_style)) {
+        $dimentions = array('width' => $width, 'height' => $height);
+        image_style_transform_dimensions($image_style, $dimentions);
+        $width  = (int)$dimentions['width'];
+        $height = (int)$dimentions['height'];
+      }
+
       // Check that image width and height are not zero.
       // Zero height/width may indicate that image file is missing.
       if ($width > 0 && $height > 0) {
@@ -304,9 +339,14 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   $height = '';
   switch ($options['captions']['height']['option']) {
     case 'fixed':
+    $height .= '/*fixed*/';
+    $height .= 'display: block;';
       $height .= 'height: ' . $options['captions']['height']['value'] . 'em;';
+    $height .= 'max-height: ' . $options['captions']['height']['value'] . 'em;';
+    break;
       // Intentionally no break here. Max-height is needed anyway.
     case 'limit':
+    $height .= '/*limit*/';
       $height .= 'max-height: ' . $options['captions']['height']['value'] . 'em;';
       break;
   }
