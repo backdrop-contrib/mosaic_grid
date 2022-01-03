@@ -135,7 +135,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
     $form['captions']['height'] = array(
       '#type' => 'container',
       '#attributes' => array(
-        'class' => 'container-inline',
+        'class' => array('container-inline'),
       ),
     );
 
