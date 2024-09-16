@@ -110,8 +110,10 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       }
     }
 
-    // Create caption selector form for all available image fields.
+    // Create caption selector form and related state conditions for
+    // all available image fields.
     $image_fields = $this->get_all_image_fields();
+    $state_conditions = array();
     if (!empty($image_fields)) {
       foreach ($image_fields as $image_field) {
         $image_field_id = $image_field->options['id'];
@@ -137,6 +139,9 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
           '#empty_option' => t('None'),
           '#default_value' => $default_value,
         );
+
+        // Add state condition that disables related form elements if all image selectors are set to None.
+        $state_conditions[':input[name="style_options[captions][source][' . $image_field_id . ']"]'] = array('value' => '');
       }
     }
 
@@ -151,9 +156,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#default_value' => $this->options['captions']['display'],
       '#options' => $caption_display,
       '#states' => array(
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
 
@@ -184,9 +187,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#options' => $caption_height_options,
       '#default_value' => $this->options['captions']['height']['option'],
       '#states' => array(
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
 
@@ -202,9 +203,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
         'invisible' => array(
           ':input[name="style_options[captions][height][option]"]' => array('value' => 'auto'),
         ),
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
 
@@ -220,9 +219,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#default_value' => $this->options['captions']['no_padding_h'],
       '#description' => t('Horizontally align the caption with the grid item. This overrides the padding setting in the <a href="@link" target="_blank">configuration page</a> (currently set to <em>@global_padding_setting em</em>).', array('@link' => url('admin/config/media/mosaic_grid'), '@global_padding_setting' => config_get('mosaic_grid.settings', 'caption_padding'))),
       '#states' => array(
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
   }
