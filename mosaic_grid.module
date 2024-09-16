@@ -356,7 +356,7 @@ function mosaic_grid_preprocess_views_view_field(&$variables) {
         }
         else {
           // For title and custom text fields get flat value.
-          // Put the value in array for consistency, so that it 
+          // Put the value in array for consistency, so that it
           // is used for one image only.
           $text_items = array($text_field->render($row_data));
         }
