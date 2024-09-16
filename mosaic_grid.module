@@ -349,16 +349,21 @@ function mosaic_grid_preprocess_views_view_field(&$variables) {
       }
       // If text is a field, not alt or title tag, get the text field.
       if (!in_array($caption_source, ['', 'alt_tag', 'title_tag'])) {
-        $text_field = $view->field[$caption_source];
-        if (method_exists($text_field, 'get_items')) {
-          // Get array of values(items) for the text field.
-          $text_items = $text_field->get_items($row_data);
-        }
-        else {
-          // For title and custom text fields get flat value.
-          // Put the value in array for consistency, so that it
-          // is used for one image only.
-          $text_items = array($text_field->render($row_data));
+        // Check that text field referred by the option is not removed from the view.
+        if (!empty($view->field[$caption_source])) {
+          // Get text field defined as caption text source.
+          $text_field = $view->field[$caption_source];
+          // Rich text fields have method 'get_items'.
+          if (method_exists($text_field, 'get_items')) {
+            // Get array of values(items) for the text field.
+            $text_items = $text_field->get_items($row_data);
+          }
+          else {
+            // For title and custom text fields get flat value.
+            // Put the value in an array for consistency, so that it
+            // is used for one image only.
+            $text_items = array($text_field->render($row_data));
+          }
         }
       }
       // Iterate over each image field value (item).
