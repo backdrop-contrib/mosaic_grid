@@ -92,8 +92,9 @@ function mosaic_grid_config_info() {
 
 /**
  * Implements hook_theme().
- * Registers theme function that renders a single
- * item(image with a caption) of the mosaic grid.
+ * Registers theme function that renders a single item(image with a caption)
+ * of the Mosaic Grid. Check mosaic_grid_item.theme.inc for variables
+ * explanation.
  */
 function mosaic_grid_theme($existing, $type, $theme, $path) {
   return array(
@@ -148,7 +149,8 @@ function mosaic_grid_views_pre_render(&$view) {
 
 /**
  * Preprocess function for module's template views_view_mosaic-grid.tpl.php.
- * Loads libraries and generates css according to the style plugin options.
+ * Loads libraries and generates styles according to the Mosaic Grid style
+ * plugin options.
  */
 function template_preprocess_views_view_mosaic_grid(&$vars) {
   // Get current view.
@@ -336,6 +338,7 @@ function mosaic_grid_preprocess_views_view_field(&$variables) {
   $row_data  = $variables['row'];
   $field     = $variables['field'];
 
+  // Process the field if it is an image.
   if (!empty($field->field_info['type'])) {
     if ($field->field_info['type'] == 'image') {
       $image_field_id = $field->options['id'];
