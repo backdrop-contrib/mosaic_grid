@@ -60,7 +60,6 @@ function mosaic_grid_library_info() {
       backdrop_get_path('module', 'mosaic_grid') . '/library/jquery.lazyloadxt.fadein.min.css' => array(),
     ),
   );
-
   return $libraries;
 }
 
@@ -76,7 +75,6 @@ function mosaic_grid_menu() {
     'access arguments' => array('administer site configuration'),
     'file' => 'mosaic_grid.admin.inc',
   );
-
   return $items;
 }
 
@@ -93,9 +91,38 @@ function mosaic_grid_config_info() {
 }
 
 /**
+ * Implements hook_theme().
+ * Registers theme function that renders a single item(image with a caption)
+ * of the Mosaic Grid. Check mosaic_grid_item.theme.inc for variables
+ * explanation.
+ */
+function mosaic_grid_theme($existing, $type, $theme, $path) {
+  return array(
+    'mosaic_grid_item' => array(
+      'variables' => array(
+        'image_item'      => NULL,
+        'image_field_id'  => '',
+        'image_style'     => '',
+        'text_item'       => NULL,
+        'text_field'      => NULL,
+        'options' => array(
+          'gap' => 0,
+          'captions' => array(
+            'display' => 'static',
+            'source'  => '',
+          ),
+        ),
+      ),
+      'file' => 'mosaic_grid_item.theme.inc',
+    ),
+  );
+}
+
+
+/**
  * Implements hook_views_pre_render().
  * Displays warning about styles in preview mode.
-}*/
+ */
 function mosaic_grid_views_pre_render(&$view) {
   if (isset($view->preview)) {
     $options = $view->style_plugin->options;
@@ -122,10 +149,10 @@ function mosaic_grid_views_pre_render(&$view) {
 
 /**
  * Preprocess function for module's template views_view_mosaic-grid.tpl.php.
- * Contains most of the module's logic.
+ * Loads libraries and generates styles according to the Mosaic Grid style
+ * plugin options.
  */
 function template_preprocess_views_view_mosaic_grid(&$vars) {
-
   // Get current view.
   $view = $vars['view'];
   // Get style plugin for this view.
@@ -134,135 +161,17 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   $config  = config('mosaic_grid.settings');
   $options = $vars['options'];
 
-  // Get image field settings and formatter type.
-  $image_field = $style_plugin->get_first_non_excluded_image_field();
-  $image_field_formatter = $image_field['handler']->options['type'];
-  $image_field_settings  = $image_field['handler']->options['settings'];
-
-  // Try to get image field style based on formatter type.
-  if (isset($image_field_formatter)) {
-    switch ($image_field_formatter) {
-      case 'image':
-        $image_style = $image_field_settings['image_style'];
-        break;
-      case 'photoswipe':
-        $image_style = $image_field_settings['photoswipe_node_style'];
-        break;
-      case 'colorbox':
-        $image_style = $image_field_settings['colorbox_node_style'];
-        break;
-      case 'featherlight':
-        $image_style = $image_field_settings['featherlight_image_style_content'];
-        break;
-      default:
-        $image_style = '';
-    }
-  }
-
-  // Find names of the image and text fields handlers.
-  // These are needed to retrieve fields raw and rendered data.
-  $image_field_name = $image_field['field_name'];
-  $text_field_name  = $style_plugin->get_first_non_excluded_text_field()['field_name'];
-
-  // Get and process all the required data for image display.
-  if (isset($image_field_name)) {
-    // Set arrays for storing data.
-    $items_rendered = array();
-    $items_width    = array();
-    $items_height   = array();
-    $captions = empty($options['captions']['source']) ? NULL : array();
-
-    // Get number of items(rows).
-    $rows = count($view->result);
-
-    // Process each item(row).
-    for ($i = 0; $i < $rows; $i++) {
-      // Get raw image fields value.
-      $image_field_value = $style_plugin->get_field_value($i, $image_field_name);
-      if (empty($image_field_value)) {
-        continue;
-      }
-
-      // Get width and height of an image. It is assumed that image field has
-      // one value.
-      $width  = $image_field_value[0]['width'];
-      $height = $image_field_value[0]['height'];
-
-      // Adjust width and height if image style is present.
-      if (!empty($image_style)) {
-        $dimentions = array('width' => $width, 'height' => $height);
-        image_style_transform_dimensions($image_style, $dimentions);
-        $width  = (int)$dimentions['width'];
-        $height = (int)$dimentions['height'];
-      }
-
-      // Check that image width and height are not zero.
-      // Zero height/width may indicate that image file is missing.
-      if ($width > 0 && $height > 0) {
-        // Store image dimentions.
-        $items_width[$i]  = $width;
-        $items_height[$i] = $height;
-        // Store rendered image field.
-        $items_rendered[$i] = $style_plugin->get_field($i, $image_field_name);
-
-        // If caption source is set then store captions.
-        switch ($options['captions']['source']) {
-          case 'alt':
-            $alt_value = $image_field_value[0]['alt'];
-            if (isset($alt_value) && $alt_value != '') {
-              $captions[$i] = '<p>' . $alt_value . '</p>';
-            }
-            break;
-          case 'title':
-            $title_value = $image_field_value[0]['title'];
-            if (!empty($title_value)) {
-              $captions[$i] = '<p>' . $title_value . '</p>';
-            }
-            break;
-          case 'text':
-            if (isset($text_field_name)) {
-              // Get text field as caption.
-              $text = $style_plugin->get_field($i, $text_field_name);
-              // If text is not html then wrap it in <p> tags. This is required for proper styling.
-              if ($text == strip_tags($text)) {
-                $text = '<p>' . $text . '</p>';
-              }
-              $captions[$i] = $text;
-            }
-            break;
-        }
-      }
-      elseif (empty($options['hide_empty'])) {
-        // Fill in values needed for empty image warning display.
-        $items_rendered[$i] = FALSE;
-        $items_width[$i] = 100;
-        $items_height[$i] = 100;
-      }
-    }
-  }
-  else {
-    // This shouldn't be ever seen by a user as style plugin
-    // validation should ensure an image field is added to views.
-    backdrop_set_message(t('No image field found.'), 'error');
-    return;
-  }
-
   // Create unique id for the mosaic grid.
   $mosaic_id = 'mosaic-grid-' . $view->name . '-' . $view->current_display;
 
-  // Store data in variables to be accessible by the template.
-  $vars['items_rendered'] = $items_rendered;
-  $vars['captions']       = $captions;
-  $vars['width']          = $items_width;
-  $vars['height']         = $items_height;
-  $vars['mosaic_id']      = $mosaic_id;
+  // Store data in variables to be easily accessible by the template.
+  $vars['rendered_mosaic_items'] = $style_plugin->rendered_mosaic_items;
+  $vars['mosaic_id']             = $mosaic_id;
+  $vars['lazyload_enabled']      = $config->get('lazyload_enabled');
 
   // Create settings array for js.
   $js_settings = array(
     'mosaic_grid' => array(
-      'lazyload' => array(
-        'edgeY'          => $config->get('lazyload_edgeY'),
-      ),
       $mosaic_id => array(
         'max_row_height' => $options['max_row_height'],
         'max_rows'       => $options['max_rows'],
@@ -274,31 +183,29 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
   // Get module's directory.
   $module_dir = backdrop_get_path('module', 'mosaic_grid');
 
-  // Add flexImages and lazyLoadXt jQuery libraries.
+  // Add flexImages jQuery library.
   backdrop_add_library('mosaic_grid', 'flexImages', FALSE);
-  backdrop_add_library('mosaic_grid', 'lazyloadxt', FALSE);
 
-  // Add settings and load js to initiate plugins.
-  backdrop_add_js($js_settings, 'setting');
-  backdrop_add_js($module_dir . '/js/mosaic_grid.js');
+  // If lazyload is enabled then do all related setup.
+  if ($config->get('lazyload_enabled')) {
+    // Add lazyload javascript settings.
+    $js_settings['mosaic_grid']['lazyload'] = array(
+        'edgeY' => $config->get('lazyload_edgeY'),
+      );
 
-  // Load module's styles.
-  backdrop_add_css($module_dir . '/css/mosaic_grid.css');
+    // Add lazyLoadXt library.
+    backdrop_add_library('mosaic_grid', 'lazyloadxt', FALSE);
 
-  // Check loader style setting.
-  $loader_style = $config->get('loader_style');
+    // Check loader style setting.
+    $loader_style = $config->get('loader_style');
 
-  // The rest of the function code below generates customized CSS, based on
-  // configuration, and module options.
-  $custom_css = '';
+    // If one of the loader styles selected then add it's CSS file.
+    if (!empty($loader_style)) {
+      backdrop_add_css($module_dir . '/css/mosaic_grid_loader_' . $loader_style . '.css');
 
-  // If one of the loader styles selected then add it's CSS file.
-  if (!empty($loader_style)) {
-    backdrop_add_css($module_dir . '/css/mosaic_grid_loader_' . $loader_style . '.css');
-
-    // Add color customisation as inline css.
-    $color_hex = $config->get('loader_color');
-    switch ($loader_style) {
+      // Add color customisation as inline css.
+      $color_hex = $config->get('loader_color');
+      switch ($loader_style) {
         case 'spinning_ring':
         case 'spinning_ring_thin':
           // Check if color is a valid hex color and convert it to rgb.
@@ -308,7 +215,7 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
           else {
             $color = Color::hexToRgb('#ffffff');
           }
-          $custom_css = "
+          $loader_custom_css = "
             .mosaic-grid-loader {
               border-color: rgba({$color['red']}, {$color['green']}, {$color['blue']}, 0.2);
               border-left-color: {$color_hex};
@@ -318,14 +225,14 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
         case 'floating_balls':
         case 'three_dots':
         case 'square_blocks':
-          $custom_css = "
+          $loader_custom_css = "
             .mosaic-grid-loader {
               color: {$color_hex};
             }";
           break;
 
         case 'vertical_blocks':
-          $custom_css = "
+          $loader_custom_css = "
             .mosaic-grid-loader,
             .mosaic-grid-loader:before,
             .mosaic-grid-loader:after {
@@ -335,6 +242,18 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
           break;
       }
     }
+  }
+
+  // Add settings and load js to initiate plugins.
+  backdrop_add_js($js_settings, 'setting');
+  backdrop_add_js($module_dir . '/js/mosaic_grid.js');
+
+  // Load module's styles.
+  backdrop_add_css($module_dir . '/css/mosaic_grid.css');
+
+  // The rest of the function code below generates customized CSS, based on
+  // configuration, and module options.
+  $custom_css = empty($loader_custom_css) ? '' : $loader_custom_css;
 
   // Set caption height options.
   $height = '';
@@ -371,17 +290,17 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
         background: rgba({$color['red']}, {$color['green']}, {$color['blue']}, {$opacity});
         font-size: {$font_size}em;
         {$height}
-      }
-      .mosaic-grid-caption > * {
-        color: {$font_color} !important;
         padding: {$padding}em {$padding_h}em;
+      }
+      .mosaic-grid-caption * {
+        color: {$font_color} !important;
       }";
   }
   else {
     if ($options['captions']['no_padding_h']) {
       // Make 'no horisontal padding' work even when no custom caption style set.
       $custom_css .= "
-        .mosaic-grid-caption > * {
+        .mosaic-grid-caption {
           padding-left: 0em;
           padding-right: 0em;
         }";
@@ -399,6 +318,71 @@ function template_preprocess_views_view_mosaic_grid(&$vars) {
     backdrop_add_css($vars['custom_css'], array('type' => 'inline'));
   }
 }
+
+
+/**
+ * Implements hook_preprocess_views_view_field().
+ * Catches image field data and related caption data, renders
+ * Mosaic grid item and stores it in array for the view template.
+ */
+function mosaic_grid_preprocess_views_view_field(&$variables) {
+  $view         = $variables['view'];
+  $style_plugin = $view->style_plugin;
+
+  // Run the code only if Mosaic Grid plugin is used.
+  if ($style_plugin->plugin_name != 'mosaic_grid') {
+    return;
+  }
+
+  $row_index = $view->row_index;
+  $row_data  = $variables['row'];
+  $field     = $variables['field'];
+
+  // Process the field if it is an image.
+  if (!empty($field->field_info['type'])) {
+    if ($field->field_info['type'] == 'image') {
+      $image_field_id = $field->options['id'];
+      // Obtain text source for image caption if defined.
+      $caption_source = '';
+      if (!empty($style_plugin->options['captions']['source'][$image_field_id])) {
+        $caption_source = $style_plugin->options['captions']['source'][$image_field_id];
+      }
+      // If text is a field, not alt or title tag, get the text field.
+      if (!in_array($caption_source, ['', 'alt_tag', 'title_tag'])) {
+        $text_field = $view->field[$caption_source];
+        if (method_exists($text_field, 'get_items')) {
+          // Get array of values(items) for the text field.
+          $text_items = $text_field->get_items($row_data);
+        }
+        else {
+          // For title and custom text fields get flat value.
+          // Put the value in array for consistency, so that it
+          // is used for one image only.
+          $text_items = array($text_field->render($row_data));
+        }
+      }
+      // Iterate over each image field value (item).
+      $image_items = $field->get_items($row_data);
+      foreach ($image_items as $i => $image_item) {
+        // Create a Mosaic Grid item with an image and a caption text.
+        $mosaic_grid_item = theme(
+          'mosaic_grid_item',
+          array(
+              'image_item'       => $image_item,
+              'image_field_id'   => $image_field_id,
+              'image_style'      => $style_plugin->image_styles[$image_field_id],
+              'text_item'        => empty($text_items[$i]) ? NULL : $text_items[$i],
+              'text_field'       => empty($text_field)     ? NULL : $text_field,
+              'options'          => $style_plugin->options,
+          )
+        );
+        // Save the item to an array that will be used for gallery generation.
+        $style_plugin->rendered_mosaic_items[] = $mosaic_grid_item;
+      }
+    }
+  }
+}
+
 
 /**
  * Implements hook_preprocess_image().
@@ -420,3 +404,4 @@ function mosaic_grid_preprocess_image(&$variables) {
   $variables['attributes']['lazy-src'] = file_create_url($path_or_uri);
   $variables['attributes']['src'] = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 }
+

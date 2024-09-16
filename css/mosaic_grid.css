@@ -44,6 +44,7 @@
   background: rgba(255, 255, 255, 1);
   overflow: hidden;
   pointer-events: auto;
+  padding: 0.5em;
 }
 
 .mosaic-grid-item:hover > .mosaic-grid-overlay {
@@ -51,8 +52,7 @@
 }
 
 .mosaic-grid-caption > * {
-  display: table-cell;
-  padding: 0.5em;
+  display: inline;
 }
 
 .mosaic-grid-empty {
