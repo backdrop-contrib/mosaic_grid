@@ -42,3 +42,49 @@ function mosaic_grid_update_1200() {
   $config->save();
 }
 
+/**
+ * Captions settings update for Mosaic Grid style plugin module.
+ */
+function mosaic_grid_update_1201() {
+  foreach (views_get_all_views() as $view) {
+    foreach ($view->display as $display) {
+      if (!empty($display->display_options['style_plugin']) && $display->display_options['style_plugin'] == 'mosaic_grid') {
+        // Initialize display handler and get style handler to get access to Mosaic Grid functions.
+        $view->init_display();
+        $style_plugin = $view->display_handler->get_plugin('style', 'mosaic_grid');
+        // Get available image fields.
+        $image_fields = $style_plugin->get_all_image_fields();
+        if (!empty($image_fields)) {
+          // Get first available image field and take its id.
+          $image_field_id = $image_fields[0]->options['id'];
+          if (!empty($display->display_options['style_options']['captions'])) {
+            // Get reference to the caption source setting for shorter code.
+            $caption_source = &$display->display_options['style_options']['captions']['source'];
+            // Convert old setting into new version of it.
+            if (!is_array($caption_source) && !empty($image_field_id)) {
+              switch($caption_source) {
+                case 'alt':
+                  $caption_source = array($image_field_id => 'alt_tag');
+                  break;
+                case 'title':
+                  $caption_source = array($image_field_id => 'title_tag');
+                  break;
+                case 'text':
+                  // Get first available text field and assign it to the image field.
+                  $text_fields = $style_plugin->get_all_text_fields();
+                  if (!empty($text_fields)) {
+                    $caption_source = array($image_field_id => $text_fields[0]->options['id']);
+                  }
+                  break;
+                default:
+                  $caption_source = array();
+              }
+              // Save updated settings.
+              $view->save();
+            }
+          }
+        }
+      }
+    }
+  }
+}
