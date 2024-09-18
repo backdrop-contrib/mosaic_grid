@@ -20,9 +20,9 @@ function mosaic_grid_views_plugins() {
       'theme path' => backdrop_get_path('module', 'mosaic_grid'),
       'uses fields' => TRUE,
       'uses row plugin' => FALSE,
-      'uses row class' => TRUE,
+      'uses row class' => FALSE,
       'uses options' => TRUE,
-      'uses grouping' => TRUE,
+      'uses grouping' => FALSE,
     ),
     ),
   );

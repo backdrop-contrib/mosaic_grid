@@ -4,9 +4,11 @@
  * Contains the Mosaic Grid style plugin.
  */
 class views_plugin_style_mosaic_grid extends views_plugin_style {
+  public $rendered_mosaic_items = array();
+  public $image_styles = array();
 
   /**
-   * Set default options
+   * Sets default options.
    */
   function option_definition() {
     $options = parent::option_definition();
@@ -15,10 +17,9 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
     $options['gap']                  = array('default' => 2);
     $options['max_rows']             = array('default' => 0);
     $options['truncate']             = array('default' => FALSE);
-    $options['hide_empty']           = array('default' => TRUE);
     $options['captions']             = array(
       'default' => array(
-        'source'       => '',
+        'source'       => array(),
         'display'      => 'hover',
         'height'       => array(
           'option' => 'auto',
@@ -31,8 +32,9 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
     return $options;
   }
 
+
   /**
-   * Render the given style.
+   * Renders options form.
    */
   function options_form(&$form, &$form_state) {
 
@@ -71,13 +73,6 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#default_value' => $this->options['truncate'],
     );
 
-    $form['hide_empty'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Hide empty images'),
-      '#description' => t("Ignore images with missing files."),
-      '#default_value' => $this->options['hide_empty'],
-    );
-
     // Caption options fieldset.
     $form['captions'] = array(
       '#type' => 'fieldset',
@@ -86,25 +81,69 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#collapsed' => TRUE,
     );
 
-    // Set options list for caption selector.
+    // Title and description for the list of text source selectors.
+    $form['captions']['source']['title'] = array(
+      '#prefix' => '<label>',
+      '#markup' => t('Text source'),
+      '#suffix' => '</label>',
+    );
+
+    $form['captions']['source']['description'] = array(
+      '#prefix' => '<div class="description">',
+      '#markup' => t('A text or title field can be added to the view, to be used as caption.'),
+      '#suffix' => '</div>',
+    );
+
+    // Set options list for text source selector.
     $caption_options = array(
-      'alt'        => t('Image alt tag'),
-      'title'      => t('Image title tag'),
+      'alt_tag'      => t('Image alt tag'),
+      'title_tag'    => t('Image title tag'),
+
     );
-    // Detect if text or title field is present, and add it to the options list.
-    $text_field = $this->get_first_non_excluded_text_field()['handler'];
-    if (!empty($text_field)) {
-      $caption_options['text'] = $text_field->ui_name();
+    // Get all text and title fields and add them to the options list.
+    $text_fields = $this->get_all_text_fields(TRUE);
+    if (!empty($text_fields)) {
+      foreach ($text_fields as $text_field) {
+        $text_field_id = $text_field->options['id'];
+        $text_field_name = $text_field->ui_name();
+        $caption_options[$text_field_id] = $text_field_name;
+      }
     }
-    // Create caption selector form.
-    $form['captions']['source'] = array(
-      '#type' => 'select',
-      '#title' => t('Text source'),
-      '#options' => $caption_options,
-      '#empty_option' => t('None'),
-      '#default_value' => $this->options['captions']['source'],
-      '#description' => t('A text or title field can be added to the view, to be used as caption.'),
-    );
+
+    // Create caption selector form and related state conditions for
+    // all available image fields.
+    $image_fields = $this->get_all_image_fields();
+    $state_conditions = array();
+    if (!empty($image_fields)) {
+      foreach ($image_fields as $image_field) {
+        $image_field_id = $image_field->options['id'];
+        $default_value = '';
+        if (isset($this->options['captions']['source'][$image_field_id])) {
+          $default_value = $this->options['captions']['source'][$image_field_id];
+        }
+
+        // Create a label with the field name above(!) the select control.
+        // We could use a description in the selector for that, but placing
+        // the label above the control reads better.
+        $label = 'label_' . $image_field_id;
+        $form['captions']['source'][$label] = array(
+          '#prefix' => '<div class="description" style="margin-top: 12px; margin-bottom: -5px">',
+          '#markup' => $image_field->ui_name(),
+          '#suffix' => '</div>',
+        );
+
+        // Create dropdow selector with text source options.
+        $form['captions']['source'][$image_field_id] = array(
+          '#type' => 'select',
+          '#options' => $caption_options,
+          '#empty_option' => t('None'),
+          '#default_value' => $default_value,
+        );
+
+        // Add state condition that disables related form elements if all image selectors are set to None.
+        $state_conditions[':input[name="style_options[captions][source][' . $image_field_id . ']"]'] = array('value' => '');
+      }
+    }
 
     $caption_display = array(
       'hover'  => t('Hidden initially, shown on mouse hover'),
@@ -117,9 +156,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#default_value' => $this->options['captions']['display'],
       '#options' => $caption_display,
       '#states' => array(
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
 
@@ -150,9 +187,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#options' => $caption_height_options,
       '#default_value' => $this->options['captions']['height']['option'],
       '#states' => array(
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
 
@@ -168,9 +203,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
         'invisible' => array(
           ':input[name="style_options[captions][height][option]"]' => array('value' => 'auto'),
         ),
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
 
@@ -186,77 +219,125 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       '#default_value' => $this->options['captions']['no_padding_h'],
       '#description' => t('Horizontally align the caption with the grid item. This overrides the padding setting in the <a href="@link" target="_blank">configuration page</a> (currently set to <em>@global_padding_setting em</em>).', array('@link' => url('admin/config/media/mosaic_grid'), '@global_padding_setting' => config_get('mosaic_grid.settings', 'caption_padding'))),
       '#states' => array(
-        'disabled' => array(
-          ':input[name="style_options[captions][source]"]' => array('value' => ''),
-        ),
+        'disabled' => $state_conditions,
       ),
     );
   }
 
+
   /**
-   * Returns first non-excluded field by type.
-   * Returned value is an array containing handler and field's name. Works only
-   * for views_handler_field_field types that have field_info and for title fields.
+   * Tries to guess and store image style used on each of the view's image fields.
+   * Image style can change image proportions and this preliminary check
+   * is needed to set image width and height inside Mosaic Grid more correctly.
+   * Some lightbox formatters used in Backdrop CMS are taken into account.
    */
-  protected function get_first_non_excluded_field(string $field_type) {
+  function pre_render($result) {
+    parent::pre_render($result);
+
+    $image_fields = $this->get_all_image_fields();
+    foreach ($image_fields as $image_field) {
+      $image_field_formatter = $image_field->options['type'];
+      $image_field_settings  = $image_field->options['settings'];
+      $image_field_id        = $image_field->options['id'];
+      $image_style           = '';
+
+      // Try to guess image field style based on formatter type.
+      if (isset($image_field_formatter)) {
+        switch ($image_field_formatter) {
+          case 'image':
+            $image_style = $image_field_settings['image_style'];
+            break;
+          case 'glightbox':
+            $image_style = $image_field_settings['glightbox_image_style_content'];
+            break;
+          case 'featherlight':
+            $image_style = $image_field_settings['featherlight_image_style_content'];
+            break;
+          case 'photoswipe':
+            $image_style = $image_field_settings['photoswipe_node_style'];
+            break;
+          case 'colorbox':
+            $image_style = $image_field_settings['colorbox_node_style'];
+            break;
+        }
+      }
+      $this->image_styles[$image_field_id] = $image_style;
+    }
+  }
+
+
+  /**
+   * Returns all field handlers of specified type.
+   * Works only for views_handler_field_field types that have field_info and for title fields.
+   */
+  protected function get_all_fields_of_type(string $field_type, bool $excluded = FALSE) {
     $fields = $this->view->display_handler->get_handlers('field');
 
-    foreach ($fields as $field_name => $field) {
-      // Ignore excluded fields.
-      if (!empty($field->options['exclude']))
+    $result = array();
+
+    foreach ($fields as $field) {
+      // Ignore excluded fields if not specified otherwise.
+      if (!empty($field->options['exclude']) && !$excluded)
         continue;
 
-      if (isset($field->field_info) || $field_type == 'title') {
+      if (isset($field->field_info) || $field_type == 'title' || $field_type == 'nothing') {
         $type = FALSE;
         if (!empty($field->field_info['type'])) {
           $type = $field->field_info['type'];
         }
-        // If it is of required type, return field handler and field name.
-        // Title has no field_info, so add a second condition.
-        if ($field_type == $type || ($field_type == 'title' && $field_name == 'title')) {
-          return array('handler' => $field, 'field_name' => $field_name);
+        // If it is of required type, return field handler.
+        // Title and custom text has no field_info, so check options['field'] instead.
+        $is_title       = $field_type == 'title'   && $field->options['field'] == 'title';
+        $is_custom_text = $field_type == 'nothing' && $field->options['field'] == 'nothing';
+        if ($field_type == $type || $is_title || $is_custom_text) {
+          $result[] = $field;
         }
       }
-
     }
-    return NULL;
+    return (count($result) > 0) ? $result : NULL;
   }
 
-  /*
-   * Returns first non excluded image field.
-   */
-  function get_first_non_excluded_image_field() {
-    return $this->get_first_non_excluded_field('image');
-  }
 
   /*
-   * Returns first non excluded text field.
+   * Returns all image field handlers.
    */
-  function get_first_non_excluded_text_field() {
-    // Set possible text field types.
+  function get_all_image_fields(bool $excluded = FALSE) {
+    return $this->get_all_fields_of_type('image', $excluded);
+  }
+
+
+  /*
+   * Returns all acceptable text field handlers.
+   */
+  function get_all_text_fields(bool $excluded = FALSE) {
+    $result = [];
+    // Get possible text field types.
     $text_types = $this->get_text_field_types();
     // Search for each possible type of text field.
     foreach ($text_types as $text_type) {
-      $field_data = $this->get_first_non_excluded_field($text_type);
-      // Return the fist text field found.
-      if (!empty($field_data)) {
-        return $field_data;
+      $fields = $this->get_all_fields_of_type($text_type, $excluded);
+      // Save found text fields to array.
+      if (!empty($fields)) {
+        //array_push($result, ...$fields);
+        $result = array_merge($result, $fields);
       }
     }
-    return NULL;
+    return (count($result) > 0) ? $result : NULL;
   }
+
 
   /**
    * Returns array of text field types.
+   * 'nothing' stands for Custom text field.
    */
   function get_text_field_types() {
-    return array('title', 'text', 'text_long', 'text_with_summary');
+    return array('nothing', 'title', 'text', 'text_long', 'text_with_summary');
   }
+
 
   /**
    * Validates the view configuration.
-   * Fails if there is a non-image or non-text field, or there are more
-   * than one image and text fields that are not excluded from display.
+   * Fails if current display has no image field.
    */
   function validate() {
     $errors = parent::validate();
@@ -267,57 +348,10 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       return $errors;
     }
 
-    // Get a list of fields that have been added to the display.
-    $fields = $this->display->handler->get_handlers('field');
-
-    $image_field_count = 0;
-    $text_field_count  = 0;
-
-    foreach ($fields as $field_name => $field) {
-      // Ignore fields excluded from display.
-      if (!empty($field->options['exclude'])) {
-        continue;
-      }
-
-      // Check field type.
-      if (isset($field->field_info['type'])) {
-        $field_type = $field->field_info['type'];
-      }
-      elseif ($field->field == 'title') {
-        $field_type = 'title';
-      }
-      $is_image = $field_type == 'image';
-      $is_text = in_array($field_type, $this->get_text_field_types());
-      $is_title = $field_name == 'title';
-
-      // If invalid field type found then validation failed.
-      if (!$is_image && !$is_text && !$is_title) {
-        $errors[] = t('Invalid field types found. This format requires one image field, and may optionally have one text or title field.');
-        return $errors;
-      }
-
-      // Count valid fields.
-      if ($is_image) {
-        $image_field_count ++;
-      }
-      if ($is_text  || $is_title) {
-        $text_field_count++;
-      }
-
-      // Check if there is no more than one of each valid field types.
-      if ($image_field_count > 1) {
-        $errors[] = t('There is more than one image field. This format can display only one image field.');
-        break;
-      }
-      if ($text_field_count > 1) {
-        $errors[] = t('There is more than one text field. This format can display only one text or title field.');
-        break;
-      }
-    }
-
-    // Check if there is at least one image field.
-    if ($image_field_count < 1) {
-      $errors[] = t('There are no image fields. This format requires at least one image field.');
+    // Check if any image fields are present and report an error if none.
+    $image_fields = $this->get_all_image_fields();
+    if (empty($image_fields)) {
+      $errors[] = t('No image fields are attached to %display or they are hidden. %mosaic_grid format requires at least one exposed image field.', array('%mosaic_grid' => $this->plugin_title(), '%display' => $this->display->display_title));
     }
 
     return $errors;
