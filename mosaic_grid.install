@@ -62,7 +62,7 @@ function mosaic_grid_update_1201() {
             $caption_source = &$display->display_options['style_options']['captions']['source'];
             // Convert old setting into new version of it.
             if (!is_array($caption_source) && !empty($image_field_id)) {
-              switch($caption_source) {
+              switch ($caption_source) {
                 case 'alt':
                   $caption_source = array($image_field_id => 'alt_tag');
                   break;

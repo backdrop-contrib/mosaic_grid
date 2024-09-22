@@ -10,3 +10,8 @@ configure = admin/config/media/mosaic_grid
 tags[] = Images
 tags[] = Media
 tags[] = Structure
+
+; Added by Backdrop CMS packaging script on 2024-09-18
+project = mosaic_grid
+version = 1.x-2.2.0
+timestamp = 1726664258
