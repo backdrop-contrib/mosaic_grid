@@ -5,7 +5,9 @@
  */
 class views_plugin_style_mosaic_grid extends views_plugin_style {
   public $rendered_mosaic_items = array();
+  public $rendered_field_values = array();
   public $image_styles = array();
+  public $field_now_rendered = NULL;
 
   /**
    * Sets default options.
@@ -31,7 +33,6 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
 
     return $options;
   }
-
 
   /**
    * Renders options form.
@@ -123,7 +124,7 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
         }
 
         // Create a label with the field name above(!) the select control.
-        // We could use a description in the selector for that, but placing
+        // We could use a #description param for that, but placing
         // the label above the control reads better.
         $label = 'label_' . $image_field_id;
         $form['captions']['source'][$label] = array(
@@ -263,6 +264,63 @@ class views_plugin_style_mosaic_grid extends views_plugin_style {
       }
       $this->image_styles[$image_field_id] = $image_style;
     }
+  }
+
+  /**
+   * Render all of the fields for a given style and store them on the object.
+   * 
+   * This is a slight modification of the parent views_plugin_style:render_fields().
+   * It tracks what field is being rendered and the field's id can be accessed
+   * via $field_now_rendered public variable. That allows theme_item_list() hook
+   * to associate rendered value with a field id where value comes from. Once render
+   * is done the result is stored in array where all field values are kept separate
+   * and not in an html list.
+   */
+  function render_fields($result) {
+    if (!$this->uses_fields()) {
+      return;
+    }
+
+    if (!isset($this->rendered_fields)) {
+      $this->rendered_fields = array();
+      $this->view->row_index = 0;
+      $keys = array_keys($this->view->field);
+
+      // If all fields have a field::access FALSE, there might be no fields; so
+      // there is no reason to execute this code.
+      if (!empty($keys)) {
+        foreach ($result as $count => $row) {
+          $this->view->row_index = $count;
+          foreach ($keys as $id) {
+            // Set variable that contains currently rendered field id.
+            $this->field_now_rendered = $id;
+            // This is where theme_item_list hook is called and separate values of
+            // multi value fields are collected and stored in rendered_field_values.
+            $this->rendered_fields[$count][$id] = $this->view->field[$id]->theme($row);
+            unset($this->field_now_rendered);
+          }
+
+          $this->row_tokens[$count] = $this->view->field[$id]->get_render_tokens(array());
+        }
+      }
+      unset($this->view->row_index);
+    }
+
+    // Merge/union the array with rendered fields and the array with mutivalue fields.
+    // The first one is the result of this function. The second array contains separate
+    // (not rendered as a list) values captured by the theme_item_list hook.
+    foreach ($this->rendered_fields as $row_index => $row_data) {
+      if (!empty($this->rendered_field_values[$row_index])) {
+        $rendered_merged[$row_index] = $this->rendered_field_values[$row_index] + $row_data;
+      }
+      else {
+        $rendered_merged[$row_index] = $row_data;
+      }
+    }
+    // Now the array should contain all field values, both single and multiple.
+    $this->rendered_field_values = $rendered_merged;
+
+    return $this->rendered_fields;
   }
 
 
