@@ -31,15 +31,18 @@
           $(window, context).lazyLoadXT();
         }
         else {
-          // Initiate grid on a page.
-          var grid_settings = settings.mosaic_grid[i];
-          $('#' + i, context).flexImages({
-            container: '.mosaic-grid-item',
-            object: 'img',
-            rowHeight: Number(grid_settings.max_row_height),
-            maxRows:   Number(grid_settings.max_rows),
-            truncate:  grid_settings.truncate,
-          });
+          // Initiate grid on a page only if there actually are grid items.
+          var grid_items = document.getElementsByClassName('mosaic-grid-item');
+          if(grid_items.length > 0) {
+            var grid_settings = settings.mosaic_grid[i];
+            $('#' + i, context).flexImages({
+              container: '.mosaic-grid-item',
+              object: 'img',
+              rowHeight: Number(grid_settings.max_row_height),
+              maxRows:   Number(grid_settings.max_rows),
+              truncate:  grid_settings.truncate,
+            });
+          }
         }
       }
 
