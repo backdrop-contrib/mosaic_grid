@@ -490,7 +490,7 @@ function mosaic_grid_preprocess_item_list(&$vars) {
   $view = views_get_current_view();
   if (!isset($view) || !is_object($view)) return;
   $style_plugin = $view->style_plugin;
-  if ($style_plugin->plugin_name != 'mosaic_grid') return;
+  if (!isset($style_plugin->plugin_name) || $style_plugin->plugin_name != 'mosaic_grid') return;
 
   // Get id of a field that is being rendered.
   if (!isset($style_plugin->field_now_rendered) || !isset($view->row_index)) {
@@ -511,7 +511,7 @@ function mosaic_grid_preprocess_image(&$variables) {
   // Check if there is an active view with Mosaic Grid style plugin.
   $view = views_get_current_view();
   if (!isset($view) || !is_object($view)) return;
-  if ($view->style_plugin->plugin_name != 'mosaic_grid') return;
+  if (!isset($view->style_plugin->plugin_name) || $view->style_plugin->plugin_name != 'mosaic_grid') return;
 
   // Check if image lazy loading is enabled in module settings.
   $lazyload = config_get('mosaic_grid.settings', 'lazyload_enabled');
